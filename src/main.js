@@ -55,9 +55,15 @@ var getGraphData = function() {
   var links = parsed.links.map(function(p) {
     return {
       source: linkIndexOf(p.source, parsed.nodes),
-      target: linkIndexOf(p.target, parsed.nodes) || 0
+      target: linkIndexOf(p.target, parsed.nodes)
     }
+  }).filter(function(p) {
+    return p['source'] != undefined && p['target'] != undefined
   });
+
+  console.log(parsed.nodes)
+  console.log(parsed.links)
+  console.log(links)
 
   return {
     "directed": true,
@@ -194,8 +200,8 @@ var buildTree = function(root_index) {
   zoom.on("zoom", onZoomChanged);
 
   function render() {  
-    tree = Tree.render(getTreeData({"id":"kernelfunctions"}));
-    start = {"id":"kernelfunctions", text: "Kernel Functions"};
+    tree = Tree.render(getTreeData({"id":"machinelearning"}));
+    start = {"id":"machinelearning", text: "Machine Learning"};
 
     graph = DAG.render(getGraphData(), zoom, function(d) {
       if (d['id'] !== history[history.length - 1]['id']) {
