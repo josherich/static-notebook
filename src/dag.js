@@ -228,13 +228,13 @@
           .attr("class", function(d) { return formatClassName('text', d) })
           .attr("x", 15)
           .attr("y", ".31em")
-          .text(function(d) { return d.id; });
+          .text(function(d) { return d.text; });
 
-      nodes.append("svg:text")
-          .attr("class", function(d) { return formatClassName('text', d) })
-          .attr("x", 15)
-          .attr("y", "1.31em")
-          .text(function(d) { return d.content; });
+      // nodes.append("svg:text")
+      //     .attr("class", function(d) { return formatClassName('text', d) })
+      //     .attr("x", 15)
+      //     .attr("y", "1.31em")
+      //     .text(function(d) { return d.content; });
 
     // Build linked index
     data.links.forEach(function(d) {
@@ -266,6 +266,10 @@
       .gravity(.05)
       .charge(-300)
       .linkDistance(100);
+
+    d3.select(".graph")
+      .select('svg')
+      .remove()
 
     // Setup graph
     graph = d3.select(".graph")

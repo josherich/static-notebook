@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>dependent writing</title>
+    <title>Graph Writing</title>
     <meta name="viewport" content="width=device-width">
     <style>
 
@@ -40,6 +40,43 @@
 
   .forward, .back {
     cursor: pointer;
+  }
+
+  .hidden-latex {
+    display: none;
+  }
+
+  .content {
+    width: 100%;
+    padding: 20px;
+    float: left;
+    border-top: 1px solid #666;
+    margin-bottom: 100px;
+  }
+
+  .content-editor {
+    display: block;
+    width: 50%;
+    float: left;
+  }
+
+  .content-body {
+    width: 50%;
+    float: left;
+  }
+
+  #content_editor {
+    display: block;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    padding: 20px;
+    font-size: 1.2em;
+  }
+
+  #rerender {
+    display: block;
+    margin-bottom: 10px;
   }
 
   svg {
@@ -123,18 +160,7 @@
     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJAQMAAADaX5RTAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyBpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBXaW5kb3dzIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOkU5MjRDMEQ5NjQzNzExRTBCM0JDQkU2MzVGQTBCNjRDIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOkU5MjRDMERBNjQzNzExRTBCM0JDQkU2MzVGQTBCNjRDIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6RTkyNEMwRDc2NDM3MTFFMEIzQkNCRTYzNUZBMEI2NEMiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6RTkyNEMwRDg2NDM3MTFFMEIzQkNCRTYzNUZBMEI2NEMiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz7uh53jAAAABlBMVEUAAAD///+l2Z/dAAAAAnRSTlP/AOW3MEoAAAARSURBVAhbY/jfwABBcAATAQB6xwj7vHGbwAAAAABJRU5ErkJggg==);
     margin-bottom: 5px;
   }
-  
-  .hidden-latex {
-    display: none;
-  }
 
-  .content {
-    width: 100%;
-    padding: 20px;
-    float: left;
-    border-top: 1px solid #666;
-    margin-bottom: 100px;
-  }
     </style>
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.8.3/katex.min.css"> -->
   </head>
@@ -152,11 +178,10 @@
         <span class="forward">Forward</span>
       </div>
       <div class="content-body"></div>
-    </div>
-  
-
-    <div class="hidden-latex" id="featurespaces">
-      <div class="markdown">
+      <div class="content-editor">
+        <button id="rerender">render</button>
+        <textarea name="" id="content_editor" cols="30" rows="10">
+# [feature spaces](#featurespaces)
 ### Very large feature spaces have two potential issues:
 - 1. [Overfitting](#overfitting)
 - 2. Memory and computational costs
@@ -164,21 +189,18 @@
 > Overfitting we handle with regularization.
 
 > “[Kernel methods](#kernelmethods)” can (sometimes) help with memory and computational costs.
-      </div>
-    </div>
 
 
-    <div class="hidden-latex" id="kernelmethods">
-       <div class="markdown">
+
+# kernelmethods
+
 ## Definition
 
 A method is kernelized if every feature vector ψ(x) only appears inside an inner product with another feature vector ψ(x′). In particular, this applies to both the optimization problem and the prediction function.
-      </div>
-    </div>
 
 
-    <div class="hidden-latex" id="kernelfunction">
-       <div class="markdown">
+# kernelfunction
+
 ### The Kernel Function
 
 - Input space: $\mathbf{X}$
@@ -200,213 +222,29 @@ What are the Benefits of Kernelization?
 - 2. Can sometimes avoid any O(d) operations, allows access to infinite-dimensional feature spaces.
 
 - 3. Allows thinking in terms of “similarity” rather than features.
-      </div>
-    </div>
 
-    <div class="hidden-latex" id="simiscore">
-       <div class="markdown">
+
+# simiscore
+
 It is often useful to think of the kernel function as a similarity score. But this is not a mathematically precise statement.
 
+# overfitting
+
+jibberish
+        </textarea>
       </div>
     </div>
-
-
-    <div class="hidden-latex" id="overfitting">
-      <div class="markdown">### Overfitting</div>
-    </div>
-
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.0.1/d3.v3.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.8.6/showdown.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/8.4.1/markdown-it.min.js"></script>
     <script type="text/javascript"
       src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
     </script>
-    <!-- </script><script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js" integrity="sha384-jmxIlussZWB7qCuB+PgKG1uLjjxbVVIayPJwi6cG6Zb4YKq0JIw+OMnkkEC7kYCq" crossorigin="anonymous"></script> -->
     <script src="./src/dag.js"></script>
     <script src="./src/tree.js"></script>
     <script src="./src/tex.js"></script>
-
-    <script>
-      MathJax.Hub.Config({
-        tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
-      });
-      var converter = new showdown.Converter({
-        backslashEscapesHTMLTags: true
-      });
-      converter.setFlavor('github');
-
-      var getGraphData = function() {
-        return {
-          "directed": true,
-          "multigraph": false,
-          "graph":[],
-          "nodes":[
-            {"id":"Subgradient", "content": "subgradient"},
-            {"id":"HingeLoss", "content": "hingeloss"},
-            {"id":"ConvexSets", "content": "convexsets"},
-            {"id":"featurespaces", "content": "featurespaces"},
-            {"id":"overfitting", "content": "overfitting"},
-            {"id":"kernelmethods", "content": "kernelmethods"},
-            {"id":"kernelfunction", "content": "kernelfunction"},
-            {"id":"simiscore", "content": "simiscore"},
-          ],
-          "links":[
-            {"source":0,"target":1},
-            {"source":0,"target":2},
-            {"source":0,"target":3},
-            {"source":3,"target":4},
-            {"source":3,"target":5},
-            {"source":3,"target":6},
-            {"source":6,"target":7},
-
-          ]};};
-
-        var nodes = getGraphData()["nodes"];
-        var links = getGraphData()["links"];
-        
-        var getTreeData = function(source) {
-          var index = 0;
-          nodes.map(function(node, idx) {
-            if (node.id === source.id) {
-              index = idx;
-            }
-          });
-          return buildTree(index);
-        };
-
-        var buildTree = function(root_index) {
-          var treeObj = {};
-          var children = [];
-          var node = nodes[root_index];
-
-          if (!node) {
-            throw Error("node index not exists.");
-          }
-          treeObj["name"] = node.id;
-          treeObj["content"] = node.content;
-          links.map(function(link, index) {
-            if (link.source == root_index) {
-              children.push(link.target);
-            }
-          });
-          treeObj["children"] = children.map(buildTree);
-          return treeObj;
-        };
-
-
-(function(window) {
-
-  var r = 10;
-  var graph, zoom;
-  var graphWidth, graphHeight;
-  var history = [];
-  var history_ptr = 0;
-
-  graphWidth = $('.graph').width() / 2;
-  graphHeight = $('.graph').height();
-
-  zoom = d3.behavior.zoom();
-  zoom.on("zoom", onZoomChanged);
-
-  graph = DAG.render(getGraphData(), zoom, function(d) {
-    history.push(d);
-    history_ptr += 1;
-    readNode(d);
-  });
-
-  function readNode(d) {
-    Tree.render(getTreeData(d));
-    $(`#${d.id} .markdown`).replaceWith(function() {
-        return converter.makeHtml($(this).text());
-    });
-    $(".content-body").html($(`#${d.id}`).html());
-    // TEX.render($(`#${d.id}`).html());
-  }
-
-  function readPrevNode() {
-    history_ptr -= 1;
-    if (history_ptr < 0) {
-      history_ptr = 0;
-    } else {
-      readNode(history[history_ptr]);
-    }
-  }
-
-  function readNextNode() {
-    history_ptr += 1;
-    if (history_ptr > history.length - 1) {
-      history_ptr = history.length - 1;
-    } else {
-      readNode(history[history_ptr]);
-    }
-  }
-
-  function onZoomChanged() {
-    graph.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")");
-  }
-
-  function onControlZoomClicked(e) {
-    var elmTarget = $(this)
-    var scaleProcentile = 0.20;
-
-    // Scale
-    var currentScale = zoom.scale();
-    var newScale;
-    if(elmTarget.hasClass('control-zoom-in')) {
-      newScale = currentScale * (1 + scaleProcentile);
-    } else {
-      newScale = currentScale * (1 - scaleProcentile);
-    }
-    newScale = Math.max(newScale, 0);
-
-    // Translate
-    var centerTranslate = [
-      (graphWidth / 2) - (graphWidth * newScale / 2),
-      (graphHeight / 2) - (graphHeight * newScale / 2)
-    ];
-
-    // Store values
-    zoom
-      .translate(centerTranslate)
-      .scale(newScale);
-
-    // Render transition
-    graph.transition()
-      .duration(500)
-      .attr("transform", "translate(" + zoom.translate() + ")" + " scale(" + zoom.scale() + ")");
-
-  }
-
-  $('.control-zoom a').on('click', onControlZoomClicked);
-  $('.back').on('click', readPrevNode);
-  $('.forward').on('click', readNextNode);
-
-  var tree = Tree.render(getTreeData({"id":"Subgradient"}));
-  var start = {"id":"kernelfunction"};
-
-  readNode(start);
-  history.push(start);
-
-  // setTimeout(function() {
-  //   DAG.focus(start);
-  // }, 2000)
-
-  $('.content').on('click', function(e) {
-    if (e.target.nodeName !== 'A') return;
-    var id = e.target.hash.replace('#', '');
-    if (nodes.filter(function(n) { return n["id"] == id }).length > 0) {
-      history.push({"id": id});
-      history_ptr += 1;
-      readNode({"id": id});
-      console.log(history);
-      console.log(history_ptr);
-    }
-  });
-
-})(window);
-
-    </script>
-
+    <script src="./src/index.js"></script>
+    <script src="./src/main.js"></script>
   </body>
 </html>
