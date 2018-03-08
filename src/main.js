@@ -2,8 +2,11 @@ MathJax.Hub.Config({
   tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
 });
 var converter = markdownit();
-var GRAPH_WRITING_KEY = 'GRAPH_WRITING_CONTENT_TMP';
+anchor(converter, {})
 
+var GRAPH_WRITING_KEY = 'GRAPH_WRITING_CONTENT_TMP';
+var SCALE_MAX = 2;
+var SCALE_MIN = 0.5;
 // converter.block.ruler.before('reference', 'my_rule', function replace(state) {
 //   console.log(state.tokens.map(function(e){return e.type}).join(":"));
 // });
@@ -21,6 +24,10 @@ function loadContent() {
 function saveContent() {
   var content = $('#content_editor').val();
   window.localStorage.setItem(GRAPH_WRITING_KEY, content);
+}
+
+function jump(h){
+  document.getElementById(h).scrollIntoView();
 }
 
 var getGraphData = function() {
@@ -109,6 +116,7 @@ var buildTree = function(root_index) {
 
   function readNode(d) {
     Tree.render(getTreeData(d));
+    jump(d.text);
     // $(`#${d.id} .markdown`).replaceWith(function() {
     //   var tokens = converter.parse($(this).text())
     //   Dependent.parse(tokens);
@@ -137,7 +145,14 @@ var buildTree = function(root_index) {
   }
 
   function onZoomChanged() {
-    graph.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")");
+    var scale = d3.event.scale;
+    // if (scale > SCALE_MAX) {
+    //   scale = SCALE_MAX;
+    // }
+    // if (scale < SCALE_MIN) {
+    //   scale = SCALE_MIN;
+    // }
+    graph.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + scale + ")");
   }
 
   function onControlZoomClicked(e) {
@@ -179,12 +194,14 @@ var buildTree = function(root_index) {
   zoom.on("zoom", onZoomChanged);
 
   function render() {  
-    tree = Tree.render(getTreeData({"id":"Subgradient"}));
-    start = {"id":"kernelfunction"};
+    tree = Tree.render(getTreeData({"id":"kernelfunctions"}));
+    start = {"id":"kernelfunctions", text: "Kernel Functions"};
 
     graph = DAG.render(getGraphData(), zoom, function(d) {
-      history.push(d);
-      history_ptr += 1;
+      if (d['id'] !== history[history.length - 1]['id']) {
+        history.push(d);
+        history_ptr += 1;
+      }
       readNode(d);
     });
 
@@ -203,14 +220,17 @@ var buildTree = function(root_index) {
   $('#rerender').on('click', function(e) {
     saveContent();
     render();
+    MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
   });
 
   $('.content').on('click', function(e) {
     if (e.target.nodeName !== 'A') return;
     var id = e.target.hash.replace('#', '');
     if (nodes.filter(function(n) { return n["id"] == id }).length > 0) {
-      history.push({"id": id});
-      history_ptr += 1;
+      if (id !== history[history.length - 1]['id']) {
+        history.push({"id": id});
+        history_ptr += 1;
+      }
       readNode({"id": id});
       console.log(history);
       console.log(history_ptr);
