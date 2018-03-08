@@ -201,8 +201,8 @@ var buildTree = function(root_index) {
   render();
 
   $('#rerender').on('click', function(e) {
+    saveContent();
     render();
-    saveContent()
   });
 
   $('.content').on('click', function(e) {
