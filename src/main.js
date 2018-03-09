@@ -32,10 +32,11 @@ function jump(h){
 
 var getGraphData = function() {
   var text = $('#content_editor').val()
-  var local = loadContent();
+  // var local = loadContent();
+  var local = null;
   if (local) {
     text = local;
-    $('#content_editor').val(local)
+    $('#content_editor').val(text);
   }
   var tokens = converter.parse(text)
   var parsed = Dependent.parse(tokens);
@@ -51,6 +52,13 @@ var getGraphData = function() {
   }
 
   $(".content-body").html(converter.render(text))
+  
+  $('.content-body')
+  .children()
+  .each(function(e) {
+    $(this).css({position: 'relative'})
+    $(this).append($('<div class="marker">M</div>'))
+  })
 
   var links = parsed.links.map(function(p) {
     return {
@@ -61,9 +69,9 @@ var getGraphData = function() {
     return p['source'] != undefined && p['target'] != undefined
   });
 
-  console.log(parsed.nodes)
-  console.log(parsed.links)
-  console.log(links)
+  // console.log(parsed.nodes)
+  // console.log(parsed.links)
+  // console.log(links)
 
   return {
     "directed": true,
@@ -217,6 +225,19 @@ var buildTree = function(root_index) {
   }
 
 
+  function toggle_graph() {
+    $('#graph').toggle()
+  }
+  function toggle_tree() {
+    $('#tree').toggle()
+  }
+  function toggle_edit() {
+    $('#editor').toggle()
+  }
+
+  function attachToStash(mark) {
+    $('#marker_stash').append(mark)
+  }
   // setTimeout(function() {
   //   DAG.focus(start);
   // }, 2000)
@@ -227,7 +248,7 @@ var buildTree = function(root_index) {
     saveContent();
     render();
     MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
-  });
+  })
 
   $('.content').on('click', function(e) {
     if (e.target.nodeName !== 'A') return;
@@ -241,6 +262,31 @@ var buildTree = function(root_index) {
       console.log(history);
       console.log(history_ptr);
     }
-  });
+  })
+
+  $('#control_panel').on('click', function(e) {
+    if (e.target.id === 'toggle_graph') {
+      toggle_graph();
+    } else if (e.target.id === 'toggle_tree') {
+      toggle_tree();
+    } else if (e.target.id === 'toggle_edit') {
+      toggle_edit();
+    }
+  })
+
+  $('.content-body').on('click', function(e) {
+    if (e.target.className === 'marker') {
+      var mark = $(e.target).parent().clone()
+      var close = $(mark).find('.marker')
+      $(close).text('x')
+      attachToStash(mark)
+    }
+  })
+
+  $('#marker_stash').on('click', function(e) {
+    if (e.target.className === 'marker') {
+      $(e.target).parent().remove();
+    }
+  })
 
 })(window);

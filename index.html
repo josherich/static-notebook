@@ -5,192 +5,23 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <title>Graph Writing</title>
     <meta name="viewport" content="width=device-width">
-    <style>
-
-  * {
-    box-sizing: border-box;
-  }
-  
-  html, body {
-    height: 100%;
-  }
-
-  body {
-    background: #fff;
-    padding:0;
-    margin:0;
-    font-family: helvetica,arial;
-  }
-  .katex { font-size: 1em !important; }
-  .graph {
-    width: 50%;
-    fill: #000;
-    overflow: hidden;
-    position: relative;
-    border-right: 1px solid #666;
-  }
-
-  .tree {
-    width: 49%;
-    fill: #000;
-    overflow: hidden;
-    position: relative;
-  }
-
-  .graph, .tree {
-    float: left;
-    height: 40%;
-  }
-
-  .forward, .back {
-    cursor: pointer;
-  }
-
-  .hidden-latex {
-    display: none;
-  }
-
-  .control {
-    display: absolute;
-    top: 10px;
-    left: 10px;
-  }
-
-  .content {
-    width: 100%;
-    height: 60%;
-    padding: 20px;
-    float: left;
-    border-top: 1px solid #666;
-  }
-
-  .content-editor {
-    display: block;
-    width: 50%;
-    float: left;
-  }
-
-  .content-body {
-    width: 50%;
-    height: 100%;
-    overflow: auto;
-    float: left;
-  }
-
-  #content_editor {
-    display: block;
-    height: 100%;
-    width: 100%;
-    padding: 20px;
-    font-size: 1.2em;
-  }
-
-  #rerender {
-    display: block;
-    margin-bottom: 10px;
-  }
-
-  svg {
-    height: 100%;
-    width: 100%;
-  }
-
-  g.dimmed  {
-    stroke-opacity: 0.05;
-  }
-
-  g.dimmed text.shadow {
-    stroke-opacity: 0;
-  }
-
-  circle {
-    fill: #ccc;
-    stroke: #333;
-    stroke-width: 1.5px;
-  }
-
-  text {
-    font: 10px sans-serif;
-    pointer-events: none;
-  }
-
-  text.shadow {
-    stroke: #fff;
-    stroke-width: 3px;
-    stroke-opacity: .8;
-  }
-
-  path.link {
-    fill: none;
-    stroke: #666;
-    stroke-width: 1.5px;
-  }
-
-  path.link.licensing {
-    stroke: green;
-  }
-
-  path.link.resolved {
-    stroke-dasharray: 0,2 1;
-  }
-
-  .control-zoom {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    background: rgba(0, 0, 0, 0.25);
-    padding: 5px;
-    border-radius: 7px;
-    z-index: 100;
-  }
-
-  .control-zoom a {
-    background: rgba(255, 255, 255, 0.75);
-    background-position: 50% 50%;
-    background-repeat: no-repeat;
-    display: block;
-    width: 19px;
-    height: 19px;
-    border-radius: 4px;
-  }
-
-  .control-zoom a:last-child {
-    margin: 0;
-  }
-
-  .control-zoom a:hover {
-    background-color: white;
-  }
-
-  .control-zoom > .control-zoom-in {
-    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJAQMAAADaX5RTAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyBpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBXaW5kb3dzIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOkUwRTZCRkI3NjQzNzExRTBBQUI3RTAwMUU2MTZDRkQ5IiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOkUwRTZCRkI4NjQzNzExRTBBQUI3RTAwMUU2MTZDRkQ5Ij4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6RTBFNkJGQjU2NDM3MTFFMEFBQjdFMDAxRTYxNkNGRDkiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6RTBFNkJGQjY2NDM3MTFFMEFBQjdFMDAxRTYxNkNGRDkiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz7cwPMXAAAABlBMVEUAAAD///+l2Z/dAAAAAnRSTlP/AOW3MEoAAAARSURBVAhbY3jcwABBcAATAQBxlwhT4XiahwAAAABJRU5ErkJggg==);
-    margin-bottom: 5px;
-  }
-
-  .control-zoom > .control-zoom-out {
-    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJAQMAAADaX5RTAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyBpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBXaW5kb3dzIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOkU5MjRDMEQ5NjQzNzExRTBCM0JDQkU2MzVGQTBCNjRDIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOkU5MjRDMERBNjQzNzExRTBCM0JDQkU2MzVGQTBCNjRDIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6RTkyNEMwRDc2NDM3MTFFMEIzQkNCRTYzNUZBMEI2NEMiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6RTkyNEMwRDg2NDM3MTFFMEIzQkNCRTYzNUZBMEI2NEMiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz7uh53jAAAABlBMVEUAAAD///+l2Z/dAAAAAnRSTlP/AOW3MEoAAAARSURBVAhbY/jfwABBcAATAQB6xwj7vHGbwAAAAABJRU5ErkJggg==);
-    margin-bottom: 5px;
-  }
-
-    </style>
+    <link rel="stylesheet" href="./src/index.css">
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.8.3/katex.min.css"> -->
   </head>
 
   <body>
     <a href="https://github.com/josherich/dependent-writing"><img style="position: absolute; top: 0; right: 0; border: 0;z-index: 10;cursor: pointer;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
-    <div class="graph">
-      <div class="control-zoom">
-          <a class="control-zoom-in" href="#" title="Zoom in"></a>
-          <a class="control-zoom-out" href="#" title="Zoom out"></a>
-        </div>
-    </div><div class="tree"></div>
-    <div class="content">
-      <div class="control">
-        <span class="back">Back</span>&nbsp;
-        <span class="forward">Forward</span>
+    <div id="widget_container">
+      <div class="graph" id="graph">
+        <div class="control-zoom">
+            <a class="control-zoom-in" href="#" title="Zoom in"></a>
+            <a class="control-zoom-out" href="#" title="Zoom out"></a>
+          </div>
+      
       </div>
-      <div class="content-body"></div>
-      <div class="content-editor">
+      <div class="tree" id="tree"></div>
+
+      <div class="content-editor" id="editor">
         <button id="rerender">render</button>
         <textarea name="" id="content_editor" cols="30" rows="10">
 # Machine Learning
@@ -225,17 +56,48 @@
 
 ## General Objective
 
+- Theoretical questions:
+  
+  - what can be learned, under what conditions?
+  
+  - are there learning guarantees?
+
+  - analysis of learning algorithms.
+
+- Algorithms:
+  - more efficient and more accurate algorithms
+
+  - deal with large-scale problmes
+
+  - handle a variety of different learning problems
+
 ## Topics
 
-- Probability tools, concentration inequalities
+- Probability tools, concentration inequalities.
 
-- PAC learning model, Rademacher complexity, VC-dimension
+- [PAC](#pac) learning model, [Rademacher complexity](#rademacher), [VC-dimension](#vcdimension).
 
-- [SVMs](#SVM), margin bounds, [kernel methods](#kernelmethods)
+- [SVMs](#SVM), margin bounds, [kernel methods](#kernelmethods).
+
+- ensemble methods, [boosting](#boosting).
+
+- Logistic regression and conditional maximum entropy models.
+
+- On-line learning, weighted majority algorithm, Perceptron algorithm, mistake bounds.
+
+- Regression, generalization, algorithms.
+
+- Ranking, generalization, algorithms.
+
+- [Reinforcement learning](#reinforcement), [MDPs](#mdp), [bandit](#bandit) problems and algorithms.
+
 
 # [feature spaces](#featurespaces)
+
 ### Very large feature spaces have two potential issues:
+
 - 1. [Overfitting](#overfitting)
+
 - 2. Memory and computational costs
 
 > Overfitting we handle with regularization.
@@ -283,9 +145,29 @@ It is often useful to think of the kernel function as a similarity score. But th
 
 # [Overfitting](#overfitting)
 
+# [MDPs](#mdp)
 
-</textarea>
+# [VC dimension](#vcdimension)
+      </textarea>
       </div>
+    </div>
+
+    <div id="marker_stash">
+      
+    </div>
+
+    <div id="control_panel">
+      <span id="toggle_graph">Graph</span>
+      <span id="toggle_tree">Tree</span>
+      <span id="toggle_edit">Edit</span>
+    </div>
+
+    <div class="content">
+      <div class="content-control">
+        <span class="back">Back</span>&nbsp;
+        <span class="forward">Forward</span>
+      </div>
+      <div class="content-body"></div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.0.1/d3.v3.min.js"></script>
