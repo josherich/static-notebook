@@ -1,28 +1,34 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Graph Writing</title>
-    <meta name="viewport" content="width=device-width">
-    <link rel="stylesheet" href="./src/index.css">
-  </head>
+# **Reading List**
 
-  <body>
-    <a href="https://github.com/josherich/dependent-writing"><img style="position: absolute; top: 0; right: 0; border: 0;z-index: 10;cursor: pointer;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
-    <div id="widget_container">
-      <div class="graph" id="graph">
-        <div class="control-zoom">
-            <a class="control-zoom-in" href="#" title="Zoom in"></a>
-            <a class="control-zoom-out" href="#" title="Zoom out"></a>
-          </div>
-      
-      </div>
-      <div class="tree" id="tree"></div>
+- foundation of data science
+- Sutton reinforcement learning draft
+- matrix calculas
+- matrix cookbook
+- math4ml
+- J&M speech and language processong, 2nd, 3rd
+- cho notes: Natural Language Understanding with Distributed Representation
+- derivatives, gradient, Jacobian
+- review-differential-calculus
+- Linguistic Fundamentals for NLP
+- neural network methods for NLP
+- granda notes
+- the four fundamental subspaces 4 lines/starting with two matrix
+- Foundations of Machine Learning (math review)
+- understanding machine learning algo
+- principle of scientific conputing
+- integral equations and fast algorithm 2017 notes
+- convolution arithmetic for deep learning
+- convex opt bubeck
+- TenLecturesFortyTwoProblems.pdf
+- geometric linear algebra
 
-      <div class="content-editor" id="editor">
-        <button id="rerender">render</button>
-        <textarea name="" id="content_editor" cols="30" rows="10">
+# **Rolling Question List**
+
+- Open set
+- Lagrangian multiplier
+- gamma density
+- is MLP multi layer perceptron equal to feature extraction(mapping function)?
+
 # **Machine Learning**
 
 ## Examples of Learning Tasks
@@ -181,71 +187,3 @@ concept class C is weakly [PAC-learnable](#) if there exists a (weak) learning a
 $$ {Pr \atop {S \sim D}} \lbrack R(h(s)) \leq \frac{1}{2} - \gamma \rbrack \ge 1 - \delta, $$
 
 - for sample S of size $m = poly(\frac{1}{\delta})$ for a fixed polymonial.
-
-# **Reading List**
-
-- foundation of data science
-- Sutton reinforcement learning draft
-- matrix calculas
-- matrix cookbook
-- math4ml
-- J&M speech and language processong, 2nd, 3rd
-- cho notes: Natural Language Understanding with Distributed Representation 
-- derivatives, gradient, Jacobian
-- review-differential-calculus
-- Linguistic Fundamentals for NLP
-- neural network methods for NLP
-- granda notes
-- the four fundamental subspaces 4 lines/starting with two matrix
-- Foundations of Machine Learning (math review)
-- understanding machine learning algo
-- principle of scientific conputing
-- integral equations and fast algorithm 2017 notes
-- convolution arithmetic for deep learning
-- convex opt bubeck
-- TenLecturesFortyTwoProblems.pdf
-- geometric linear algebra
-
-# **Rolling Question List**
-
-- Open set
-- Lagrangian multiplier
-- gamma density
-- is MLP multi layer perceptron equal to feature extraction(mapping function)?
-
-      </textarea>
-      </div>
-    </div>
-
-    <div id="marker_stash">
-      
-    </div>
-
-    <div id="control_panel">
-      <span id="toggle_graph">Graph</span>
-      <span id="toggle_tree">Tree</span>
-      <span id="toggle_edit">Edit</span>
-    </div>
-
-    <div class="content">
-      <div class="content-control">
-        <span class="back">Back</span>&nbsp;
-        <span class="forward">Forward</span>
-      </div>
-      <div class="content-body"></div>
-    </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.0.1/d3.v3.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/8.4.1/markdown-it.min.js"></script>
-    <script type="text/javascript"
-      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
-    </script>
-    <script src="./src/dag.js"></script>
-    <script src="./src/tree.js"></script>
-    <script src="./src/tex.js"></script>
-    <script src="./src/anchor.js"></script>
-    <script src="./src/index.js"></script>
-    <script src="./src/main.js"></script>
-  </body>
-</html>

@@ -7,6 +7,8 @@ anchor(converter, {})
 var GRAPH_WRITING_KEY = 'GRAPH_WRITING_CONTENT_TMP';
 var SCALE_MAX = 2;
 var SCALE_MIN = 0.5;
+var content_url = './src/data.md'
+
 // converter.block.ruler.before('reference', 'my_rule', function replace(state) {
 //   console.log(state.tokens.map(function(e){return e.type}).join(":"));
 // });
@@ -30,92 +32,54 @@ function jump(h){
   document.getElementById(h).scrollIntoView();
 }
 
-var getGraphData = function() {
-  var text = $('#content_editor').val()
-  // var local = loadContent();
-  var local = null;
-  if (local) {
-    text = local;
-    $('#content_editor').val(text);
-  }
-  var tokens = converter.parse(text)
-  var parsed = Dependent.parse(tokens);
+var getGraphData = function(callback) {
+  d3.text(content_url, function(text) {
+    $('#content_editor').val(text)
 
-  function linkIndexOf(id, nodes) {
-    var index;
-    nodes.map(function(n, i) {
-      if (n.id === id) {
-        index = i;
+    var tokens = converter.parse(text)
+
+    var parsed = Dependent.parse(tokens)
+
+    function linkIndexOf(id, nodes) {
+      var index;
+      nodes.map(function(n, i) {
+        if (n == null) {
+          index = 'NA'
+        } else if (n.id === id) {
+          index = i
+        }
+      });
+      return index;
+    }
+
+    $(".content-body").html(converter.render(text))
+    
+    $('.content-body')
+    .children()
+    .each(function(e) {
+      $(this).css({position: 'relative'})
+      $(this).append($('<div class="marker">M</div>'))
+    })
+
+    var links = parsed.links.map(function(p) {
+      return {
+        source: linkIndexOf(p.source, parsed.nodes),
+        target: linkIndexOf(p.target, parsed.nodes)
       }
+    }).filter(function(p) {
+      return p['source'] != undefined && p['target'] != undefined
     });
-    return index;
-  }
 
-  $(".content-body").html(converter.render(text))
-  
-  $('.content-body')
-  .children()
-  .each(function(e) {
-    $(this).css({position: 'relative'})
-    $(this).append($('<div class="marker">M</div>'))
+    // console.log(parsed.nodes)
+    // console.log(parsed.links)
+    // console.log(links)
+
+    callback && callback(parsed.nodes, links)
   })
-
-  var links = parsed.links.map(function(p) {
-    return {
-      source: linkIndexOf(p.source, parsed.nodes),
-      target: linkIndexOf(p.target, parsed.nodes)
-    }
-  }).filter(function(p) {
-    return p['source'] != undefined && p['target'] != undefined
-  });
-
-  // console.log(parsed.nodes)
-  // console.log(parsed.links)
-  // console.log(links)
-
-  return {
-    "directed": true,
-    "multigraph": false,
-    "graph":[],
-    "nodes": parsed.nodes,
-    "links": links
-  };
-};
-
-var nodes = getGraphData()["nodes"];
-var links = getGraphData()["links"];
-
-var getTreeData = function(source) {
-  var index = 0;
-  nodes.map(function(node, idx) {
-    if (node.id === source.id) {
-      index = idx;
-    }
-  });
-  return buildTree(index);
-};
-
-var buildTree = function(root_index) {
-  var treeObj = {};
-  var children = [];
-  var node = nodes[root_index];
-
-  if (!node) {
-    throw Error("node index not exists.");
-  }
-  treeObj["name"] = node.id;
-  treeObj["content"] = node.content;
-  links.map(function(link, index) {
-    if (link.source == root_index) {
-      children.push(link.target);
-    }
-  });
-  treeObj["children"] = children.map(buildTree);
-  return treeObj;
-};
+}
 
 
-(function(window) {
+getGraphData(function(nodes, links) {
 
   var r = 10;
   var graph, zoom;
@@ -127,6 +91,39 @@ var buildTree = function(root_index) {
 
   graphWidth = $('.graph').width() / 2;
   graphHeight = $('.graph').height();
+
+
+  var getTreeData = function(source) {
+    var index = 0;
+    nodes.map(function(node, idx) {
+      if (node == null) {
+        index = 'NA'
+      } else if (node.id === source.id) {
+        index = idx
+      }
+    });
+    return buildTree(index);
+  };
+
+  var buildTree = function(root_index) {
+    var treeObj = {};
+    var children = [];
+    var node = nodes[root_index];
+
+    if (!node) {
+      throw Error("node index not exists.");
+    }
+
+    treeObj["name"] = node.id;
+    treeObj["content"] = node.content;
+    links.map(function(link, index) {
+      if (link.source == root_index) {
+        children.push(link.target);
+      }
+    });
+    treeObj["children"] = children.map(buildTree);
+    return treeObj;
+  };
 
   function readNode(d) {
     Tree.render(getTreeData(d));
@@ -207,11 +204,11 @@ var buildTree = function(root_index) {
   zoom = d3.behavior.zoom();
   zoom.on("zoom", onZoomChanged);
 
-  function render() {  
+  function render() {
     tree = Tree.render(getTreeData({"id":"machinelearning"}));
     start = {"id":"machinelearning", text: "Machine Learning"};
 
-    graph = DAG.render(getGraphData(), zoom, function(d) {
+    graph = DAG.render({nodes: nodes, links: links}, zoom, function(d) {
       if (d['id'] !== history[history.length - 1]['id']) {
         history.push(d);
         history_ptr += 1;
@@ -288,5 +285,4 @@ var buildTree = function(root_index) {
       $(e.target).parent().remove();
     }
   })
-
-})(window);
+})
