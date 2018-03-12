@@ -45,12 +45,12 @@
       if (token.type === 'heading_open' && token.tag[0] === 'h') {
         _children = findStrong(tokens[i+1].children);
         if (_children.length > 0) {
-          block = {id: _children[0]['target'], text: _children[0]['text']};
+          block = {id: _children[0]['target'], text: _children[0]['text']}
         } else {
           // block = {id: tokens[i+1].content, text: tokens[i+1].content}
         }
-        blocks.push(block);
-        i += 2;
+        blocks.push(block)
+        i += 2
       } else if (token.type === 'inline') {
         _children = findLinks(token.children);
         _children.map(function(c) {

@@ -222,19 +222,13 @@
           .attr("x", 15)
           .attr("y", ".31em")
           .attr("class", function(d) { return 'shadow ' + formatClassName('text', d) })
-          .text(function(d) { return d.id; });
+          .text(function(d) { return d.text; });
 
       nodes.append("svg:text")
           .attr("class", function(d) { return formatClassName('text', d) })
           .attr("x", 15)
           .attr("y", ".31em")
           .text(function(d) { return d.text; });
-
-      // nodes.append("svg:text")
-      //     .attr("class", function(d) { return formatClassName('text', d) })
-      //     .attr("x", 15)
-      //     .attr("y", "1.31em")
-      //     .text(function(d) { return d.content; });
 
     // Build linked index
     data.links.forEach(function(d) {

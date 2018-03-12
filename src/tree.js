@@ -3,7 +3,7 @@
   var graphWidth = window.innerWidth / 2;
   var graphHeight = window.innerHeight * 0.4;
 
-  var margin = {top: 20, right: 120, bottom: 20, left: 120},
+  var margin = {top: 20, right: 120, bottom: 20, left: 140},
       width = graphWidth - margin.right - margin.left,
       height = graphHeight - margin.top - margin.bottom;
 

@@ -9,16 +9,6 @@ var SCALE_MAX = 2;
 var SCALE_MIN = 0.5;
 var content_url = './src/data.md'
 
-// converter.block.ruler.before('reference', 'my_rule', function replace(state) {
-//   console.log(state.tokens.map(function(e){return e.type}).join(":"));
-// });
-// converter.block.ruler.after('lheading', 'my_rule', function replace(state) {
-//   console.log(state);
-// });
-// converter.block.ruler.after('reference', 'my_rule', function replace(state) {
-//   console.log(state);
-// });
-
 function loadContent() {
   return window.localStorage.getItem(GRAPH_WRITING_KEY);
 }
@@ -53,7 +43,7 @@ var getGraphData = function(callback) {
     }
 
     $(".content-body").html(converter.render(text))
-    
+
     $('.content-body')
     .children()
     .each(function(e) {
@@ -94,30 +84,26 @@ getGraphData(function(nodes, links) {
 
 
   var getTreeData = function(source) {
-    var index = 0;
-    nodes.map(function(node, idx) {
-      if (node == null) {
-        index = 'NA'
-      } else if (node.id === source.id) {
-        index = idx
-      }
-    });
-    return buildTree(index);
+    // var index = 0;
+
+    // nodes.map(function(node, idx) {
+    //   if (node == null) {
+    //     index = 'NA'
+    //   } else if (node.id === source.id) {
+    //     index = idx
+    //   }
+    // });
+    return buildTree(source);
   };
 
-  var buildTree = function(root_index) {
+  var buildTree = function(source) {
     var treeObj = {};
     var children = [];
-    var node = nodes[root_index];
 
-    if (!node) {
-      throw Error("node index not exists.");
-    }
-
-    treeObj["name"] = node.id;
-    treeObj["content"] = node.content;
+    treeObj["name"] = source.id;
+    treeObj["content"] = source.text;
     links.map(function(link, index) {
-      if (link.source == root_index) {
+      if (link.source.id == source.id) {
         children.push(link.target);
       }
     });
@@ -128,42 +114,35 @@ getGraphData(function(nodes, links) {
   function readNode(d) {
     Tree.render(getTreeData(d));
     jump(d.text);
-    // $(`#${d.id} .markdown`).replaceWith(function() {
-    //   var tokens = converter.parse($(this).text())
-    //   Dependent.parse(tokens);
-    //   return converter.render($(this).text());
-    // });
-    // $(".content-body").html($(`#${d.id}`).html());
-    // TEX.render($(`#${d.id}`).html());
   }
 
   function readPrevNode() {
-    history_ptr -= 1;
+    history_ptr -= 1
     if (history_ptr < 0) {
-      history_ptr = 0;
+      history_ptr = 0
     } else {
-      readNode(history[history_ptr]);
+      readNode(history[history_ptr])
     }
   }
 
   function readNextNode() {
-    history_ptr += 1;
+    history_ptr += 1
     if (history_ptr > history.length - 1) {
-      history_ptr = history.length - 1;
+      history_ptr = history.length - 1
     } else {
       readNode(history[history_ptr]);
     }
   }
 
   function onZoomChanged() {
-    var scale = d3.event.scale;
+    var scale = d3.event.scale
     // if (scale > SCALE_MAX) {
     //   scale = SCALE_MAX;
     // }
     // if (scale < SCALE_MIN) {
     //   scale = SCALE_MIN;
     // }
-    graph.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + scale + ")");
+    graph.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + scale + ")")
   }
 
   function onControlZoomClicked(e) {
@@ -171,14 +150,14 @@ getGraphData(function(nodes, links) {
     var scaleProcentile = 0.20;
 
     // Scale
-    var currentScale = zoom.scale();
-    var newScale;
+    var currentScale = zoom.scale()
+    var newScale
     if(elmTarget.hasClass('control-zoom-in')) {
-      newScale = currentScale * (1 + scaleProcentile);
+      newScale = currentScale * (1 + scaleProcentile)
     } else {
-      newScale = currentScale * (1 - scaleProcentile);
+      newScale = currentScale * (1 - scaleProcentile)
     }
-    newScale = Math.max(newScale, 0);
+    newScale = Math.max(newScale, 0)
 
     // Translate
     var centerTranslate = [
@@ -189,13 +168,12 @@ getGraphData(function(nodes, links) {
     // Store values
     zoom
       .translate(centerTranslate)
-      .scale(newScale);
+      .scale(newScale)
 
     // Render transition
     graph.transition()
       .duration(500)
-      .attr("transform", "translate(" + zoom.translate() + ")" + " scale(" + zoom.scale() + ")");
-
+      .attr("transform", "translate(" + zoom.translate() + ")" + " scale(" + zoom.scale() + ")")
   }
 
   $('.control-zoom a').on('click', onControlZoomClicked);
@@ -205,7 +183,7 @@ getGraphData(function(nodes, links) {
   zoom.on("zoom", onZoomChanged);
 
   function render() {
-    tree = Tree.render(getTreeData({"id":"machinelearning"}));
+    tree = Tree.render(getTreeData({"id":"machinelearning", text: "Machine Learning"}));
     start = {"id":"machinelearning", text: "Machine Learning"};
 
     graph = DAG.render({nodes: nodes, links: links}, zoom, function(d) {
@@ -220,7 +198,6 @@ getGraphData(function(nodes, links) {
     history = [];
     history.push(start);
   }
-
 
   function toggle_graph() {
     $('#graph').toggle()
