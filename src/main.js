@@ -2,7 +2,9 @@ MathJax.Hub.Config({
   tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
 });
 var converter = markdownit();
+
 anchor(converter, {})
+footnote_plugin(converter)
 
 var GRAPH_WRITING_KEY = 'GRAPH_WRITING_CONTENT_TMP';
 var SCALE_MAX = 2;
@@ -26,7 +28,7 @@ var getGraphData = function(callback) {
   d3.text(content_url, function(text) {
     $('#content_editor').val(text)
 
-    var tokens = converter.parse(text)
+    var tokens = converter.parse(text, {})
 
     var parsed = Dependent.parse(tokens)
 

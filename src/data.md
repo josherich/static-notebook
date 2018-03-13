@@ -179,6 +179,58 @@ It is often useful to think of the kernel function as a similarity score. But th
 
 # **Weak Learning**
 
+# **NMF**
+r(n+d)
+NP-hard
+reformulated
+
+# **LDA**
+Gamma function
+Dirichlet distribution
+
+# **HMM**
+Viterbi algorithm (dp with max)
+
+# **VC dimension**
+
+vapnik chervonenkis
+growth function: expression power of hypothesis space
+dichotomy
+shatter
+Given a set S of examples and a concept class H, we say that S is shattered by H if for every A ⊆ S there exists some h ∈ H that labels all examples in A as positive and all examples in S \ A as negative.
+
+The VC-dimension of H is the size of the largest set shattered by H.
+
+## **shatter function **
+
+Given a set S of examples and a concept class H, let H[S] = {h ∩ S : h ∈ H}. That is, H[S] is the concept class H restricted to the set of points S. For integer n and class H, let H[n] = max|S|=n |H[S]|; this is called the growth function of H. 
+
+# **CRF**
+
+https://spaces.ac.cn/archives/4695/
+
+# **EM**
+
+estimation, maximization
+likelihood is usually defined on exponential function, thus use ln() to iterate EM
+to get latent variables,  compute its expectation
+
+# **regularization**
+
+why L1 get sparsity?
+Ridge
+
+# **PAC learnable**
+
+efficient
+properly
+sample complexity m >= poly(,,,)
+
+# **max entropy**
+
+uncertainty should be equally distributed
+conditional entropy
+
 ### Definition:
 
 concept class C is weakly [PAC-learnable](#) if there exists a (weak) learning algorithm L and   > 0 such that:
