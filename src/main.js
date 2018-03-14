@@ -114,8 +114,9 @@ getGraphData(function(nodes, links) {
   };
 
   function readNode(d) {
+
     Tree.render(getTreeData(d));
-    jump(d.text);
+    jump(slugify(d.text, {lower: true}));
   }
 
   function readPrevNode() {
@@ -179,8 +180,7 @@ getGraphData(function(nodes, links) {
   }
 
   $('.control-zoom a').on('click', onControlZoomClicked);
-  $('.back').on('click', readPrevNode);
-  $('.forward').on('click', readNextNode);
+
   zoom = d3.behavior.zoom();
   zoom.on("zoom", onZoomChanged);
 
@@ -203,6 +203,8 @@ getGraphData(function(nodes, links) {
 
   function toggle_graph() {
     $('#graph').toggle()
+    $('#tree').toggle()
+    $('body').toggleClass('indexing')
   }
   function toggle_tree() {
     $('#tree').toggle()
@@ -235,20 +237,16 @@ getGraphData(function(nodes, links) {
         history_ptr += 1;
       }
       readNode({"id": id});
-      console.log(history);
-      console.log(history_ptr);
+      // console.log(history);
+      // console.log(history_ptr);
     }
   })
 
-  $('#control_panel').on('click', function(e) {
-    if (e.target.id === 'toggle_graph') {
-      toggle_graph();
-    } else if (e.target.id === 'toggle_tree') {
-      toggle_tree();
-    } else if (e.target.id === 'toggle_edit') {
-      toggle_edit();
-    }
-  })
+  // $('#control_panel #toggle_tree').on('click', toggle_tree)
+  $('#control_panel #toggle_graph').on('click', toggle_graph)
+  $('#control_panel #content_back').on('click', readPrevNode)
+  $('#control_panel #content_forward').on('click', readNextNode)
+
 
   $('.content-body').on('click', function(e) {
     if (e.target.className === 'marker') {

@@ -85,7 +85,7 @@
 
 - [PAC](#pac) learning model, [Rademacher complexity](#rademacher), [VC-dimension](#vcdimension).
 
-- [SVMs](#SVM), margin bounds, [kernel methods](#kernelmethods).
+- [SVMs](#SVM), margin bounds, [kernel methods](#kernel-methods).
 
 - ensemble methods, [boosting](#boosting).
 
@@ -129,7 +129,7 @@ $$f(\alpha x + (1 - \alpha)y) \le \alpha f(x) + (1 - \alpha)f(y)$$
 
 > Overfitting we handle with regularization.
 
-> “[Kernel methods](#kernelmethods)” can (sometimes) help with memory and computational costs.
+> “[Kernel methods](#kernel-methods)” can (sometimes) help with memory and computational costs.
 
 
 
@@ -242,6 +242,21 @@ $$ {Pr \atop {S \sim D}} \lbrack R(h(s)) \leq \frac{1}{2} - \gamma \rbrack \ge 1
 - for sample S of size $m = poly(\frac{1}{\delta})$ for a fixed polymonial.
 
 ## **Hoeffding’s inequality**
+
+
+# **computation theory**
+
+### **NP-hardness**
+
+> non-deterministic polynomial-time hardness
+
+a problem H is NP-hard when every problem L in NP can be reduced in polynomial time to H; that is, assuming a solution for H takes 1 unit time, we can use H‎'s solution to solve L in polynomial time.
+
+### **P ≠ NP**
+
+> If P ≠ NP, then NP-hard problems cannot be solved in polynomial time.
+
+![nphard](https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/P_np_np-complete_np-hard.svg/800px-P_np_np-complete_np-hard.svg.png?1521031605731)
 
 # **numpy example**
 
@@ -519,7 +534,7 @@ Feb 01: Max-Cut approximation. Lifting / SDP relaxations technique in mathematic
 
 Feb 08: Unique Games Conjecture, Sum-of-Squares interpretation of SDP relaxation. Chapter 8 of Lecture Notes.
 
-Feb 15: Shannon Capacity, Lovasz Theta Function. Section 7.3.1. on Lecture Notes and ``On the Shannon Capacity of a Graph'' by Laszlo Lovasz. See also Section 6.5.3.
+Feb 15: Shannon Capacity, Lovasz Theta Function. Section 7.3.1. on Lecture Notes and "On the Shannon Capacity of a Graph" by Laszlo Lovasz. See also Section 6.5.3.
 
 Feb 22: Stochastic Block Model and Phase Transitions on graphs. Chapter 9 of Lecture Notes
 
@@ -556,7 +571,7 @@ A clique of a graph G is a subset S of its nodes such that the subgraph correspo
 
 An independence set of a graph G is a subset S of its nodes such that no two nodes in S share an edge. Equivalently it is a clique of the complement graph Gc := (V, Ec). The independence number of G is simply the clique number of Sc.
 
-## Erd ̋os-Hajnal Conjecture
+## Erdos-Hajnal Conjecture
 For any finite graph H, there exists a constant $\delta H > 0$ such that any graph on n nodes that does
 not contain H as a subgraph (is a H-free graph) must have
 
@@ -569,6 +584,18 @@ $$r(G) \geq n^{\delta^H}$$
 Given a graph G = (V, E) with non-negative weights wij on the edges, find a set S ⊂ V for which cut(S) is maximal.
 
 Goemans and Williamson [GW95] introduced an approximation algorithm that runs in polynomial time and has a randomized component to it, and is able to obtain a cut whose expected value is guaranteed to be no smaller than a particular constant αGW times the optimum cut. The constant αGW is referred to as the approximation ratio.
+
+### cut
+
+> a cut is a partition of the vertices of a graph into two disjoint subsets. Any cut determines a cut-set, the set of edges that have one endpoint in each subset of the partition.
+
+- max-cut
+- min-cut
+- sparse-cut
+
+  - The sparsest cut problem is to bipartition the vertices so as to minimize the ratio of the number of edges across the cut divided by the number of vertices in the smaller half of the partition. NP-hard, best known approximation algorithm is an O({\sqrt {\log n))) approximation due to Arora, Rao & Vazirani (2009)
+
+- cut-space
 
 ## **Unique Game Problem**
 
