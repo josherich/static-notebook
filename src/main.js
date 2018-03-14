@@ -9,7 +9,7 @@ footnote_plugin(converter)
 var GRAPH_WRITING_KEY = 'GRAPH_WRITING_CONTENT_TMP';
 var SCALE_MAX = 2;
 var SCALE_MIN = 0.5;
-var content_url = './src/data.md'
+var content_url = './src/introduction.md'
 
 function loadContent() {
   return window.localStorage.getItem(GRAPH_WRITING_KEY);
@@ -86,15 +86,6 @@ getGraphData(function(nodes, links) {
 
 
   var getTreeData = function(source) {
-    // var index = 0;
-
-    // nodes.map(function(node, idx) {
-    //   if (node == null) {
-    //     index = 'NA'
-    //   } else if (node.id === source.id) {
-    //     index = idx
-    //   }
-    // });
     return buildTree(source);
   };
 
