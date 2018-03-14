@@ -12,3 +12,7 @@ Writing technical article with DAG and Trees
 - https://github.com/auchenberg/dependo
 
 - [VoodooPad](voodoopad.com)
+
+## reference
+
+- https://github.com/sindresorhus/github-markdown-css/blob/gh-pages/github-markdown.css

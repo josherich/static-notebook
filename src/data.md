@@ -1,5 +1,6 @@
 # **Reading List**
 
+- short course fmm
 - foundation of data science
 - Sutton reinforcement learning draft
 - matrix calculas
@@ -15,9 +16,9 @@
 - the four fundamental subspaces 4 lines/starting with two matrix
 - Foundations of Machine Learning (math review)
 - understanding machine learning algo
-- principle of scientific conputing
+- principle of scientific computing
 - integral equations and fast algorithm 2017 notes
-- convolution arithmetic for deep learning
+- convolution arithmetic for deep learning*
 - convex opt bubeck
 - TenLecturesFortyTwoProblems.pdf
 - geometric linear algebra
@@ -201,7 +202,7 @@ Given a set S of examples and a concept class H, we say that S is shattered by H
 
 The VC-dimension of H is the size of the largest set shattered by H.
 
-## **shatter function **
+## **shatter function**
 
 Given a set S of examples and a concept class H, let H[S] = {h ∩ S : h ∈ H}. That is, H[S] is the concept class H restricted to the set of points S. For integer n and class H, let H[n] = max|S|=n |H[S]|; this is called the growth function of H. 
 
@@ -240,6 +241,7 @@ $$ {Pr \atop {S \sim D}} \lbrack R(h(s)) \leq \frac{1}{2} - \gamma \rbrack \ge 1
 
 - for sample S of size $m = poly(\frac{1}{\delta})$ for a fixed polymonial.
 
+## **Hoeffding’s inequality**
 
 # **numpy example**
 
@@ -506,6 +508,93 @@ for val in uniqs:  # uniq values in group
 
 print(output)
 ```
+
+# **DS-GA3001Graphs and Networks**
+
+## Detailed Syllabi for lectures:
+
+Jan 25: Introduction to graph theory, approximation algorithm, Max-Cut approximation. Chapter 8 on Lecture Notes. 
+
+Feb 01: Max-Cut approximation. Lifting / SDP relaxations technique in mathematical signal processing, phase retrieval and k-means SDP.
+
+Feb 08: Unique Games Conjecture, Sum-of-Squares interpretation of SDP relaxation. Chapter 8 of Lecture Notes.
+
+Feb 15: Shannon Capacity, Lovasz Theta Function. Section 7.3.1. on Lecture Notes and ``On the Shannon Capacity of a Graph'' by Laszlo Lovasz. See also Section 6.5.3.
+
+Feb 22: Stochastic Block Model and Phase Transitions on graphs. Chapter 9 of Lecture Notes
+
+Mar 01: Recovery in the Stochastic Block Model with Semidefinite relaxations. Chapter 9 of Lecture Notes
+
+## Detailed Syllabi for labs:
+Jan 24: review of linear algebra and probability
+
+Jan 31: discussion of homework 1
+
+Feb 07:  graph Laplacian and Cheeger's inequality
+
+Feb 14:  pseudo distribution for maxcut,  derivation of primal and dual program for Maxcut, SOS4
+
+Feb 21:  introduction to Grothendieck inequality and a proof of an upper bound of Grothendieck constant (Krivine�s bound)
+
+Feb 28:  calculate the Lovasz theta function for n-cycle and discuss connection with Grothendieck constant on graph
+
+## **Ramsey number**
+
+A natural question is whether it is possible to have arbitrarily large graphs without cliques (and without its complement having cliques), Ramsey answer this question in the negative in 1928 [Ram28]
+
+> We say an event happens with high probability if its probability is ≥ 1 − n−Ω(1)
+
+### Spencer 94
+
+> “Erd ̋os asks us to imagine an alien force, vastly more powerful than us, landing on Earth and demanding the value of R(5) or they will destroy our planet. In that case, he claims, we should marshal all our computers and all our mathematicians and attempt to find the value. But suppose, instead, that they ask for R(6). In that case, he believes, we should attempt to destroy the aliens.”
+
+## **Clique**
+
+A clique of a graph G is a subset S of its nodes such that the subgraph corresponding to it is complete. In other words S is a clique if all pairs of vertices in S share an edge. The clique number c(G) of G is the size of the largest clique of G.
+
+## **Independent set**
+
+An independence set of a graph G is a subset S of its nodes such that no two nodes in S share an edge. Equivalently it is a clique of the complement graph Gc := (V, Ec). The independence number of G is simply the clique number of Sc.
+
+## Erd ̋os-Hajnal Conjecture
+For any finite graph H, there exists a constant $\delta H > 0$ such that any graph on n nodes that does
+not contain H as a subgraph (is a H-free graph) must have
+
+$$r(G) \geq n^{\delta^H}$$
+
+## max-cut problem
+
+> to design polynomial algorithms that, in any instance, produce guaranteed approximate solutions.
+
+Given a graph G = (V, E) with non-negative weights wij on the edges, find a set S ⊂ V for which cut(S) is maximal.
+
+Goemans and Williamson [GW95] introduced an approximation algorithm that runs in polynomial time and has a randomized component to it, and is able to obtain a cut whose expected value is guaranteed to be no smaller than a particular constant αGW times the optimum cut. The constant αGW is referred to as the approximation ratio.
+
+## **Unique Game Problem**
+
+> Given a graph and a set
+of k colors, and, for each edge, a matching between the colors, the goal in the unique games problem
+is to color the vertices as to agree with as high of a fraction of the edge matchings as possible.
+
+### conjecture 
+For any ε > 0, the problem of distinguishing whether an instance of the Unique Games Problem is such that it is possible to agree with a ≥ 1 − ε fraction of the constraints or it is not possible to even agree with a ε fraction of them, is NP-hard.
+
+# **fast algorithm**
+
+## **N-body problem**
+
+### **FFT**
+
+$\sim 5NlogN$
+$$u_j = \sum_{k=1}^N e^{2\pi ijk/N}\omega_k$$
+
+## **FMM**
+- Laplace equation
+- fast Gauss transform
+- Helmholtz equation
+
+### **degenerate kernel**
+
 
 # **New Words**
 Their experience in the transformative growth of the __ride-hailing__ industry helped __pollinate__ China’s next internet-enabled transportation revolution.
