@@ -5,8 +5,8 @@
   var linkedByIndex = {};
   var layout, nodes, links, data;
   var zoom;
-  graphWidth = window.innerWidth / 2,
-  graphHeight = window.innerHeight;
+  var graphWidth = window.innerWidth / 2;
+  var graphHeight = window.innerHeight;
 
 
   function resize() {
@@ -31,8 +31,8 @@
   function centerGraph() {
 
     var centerTranslate = [
-      (graphWidth / 2) - (graphWidth * 0.2 / 2),
-      (graphHeight / 2) - (graphHeight * 0.2 / 2),
+      (graphWidth / 2) - (graphWidth * 0.5 / 2),
+      (graphHeight / 2) - (graphHeight * 0.5 / 2),
     ];
 
     zoom.translate(centerTranslate);
@@ -155,7 +155,7 @@
         elmCurrentLink.attr('marker-end', 'url(#regular)');
 
         return 1;
-      } 
+      }
 
       if (o.source !== d && o.target !== d) {
         var elmAllLinks = $('path.link:not([data-show])');

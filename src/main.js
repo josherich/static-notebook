@@ -7,9 +7,14 @@ anchor(converter, {})
 footnote_plugin(converter)
 
 var GRAPH_WRITING_KEY = 'GRAPH_WRITING_CONTENT_TMP';
+var GRAPH_WRITING_OPTION_STRONG = 'GRAPH_WRITING_OPTION_STRONG';
 var SCALE_MAX = 2;
 var SCALE_MIN = 0.5;
 var content_url = './src/introduction.md'
+var content_cache = null;
+var node_history = [];
+var history_ptr = 0;
+var start = {"id":"machine-learning", text: "Machine Learning"};
 
 function loadContent() {
   return window.localStorage.getItem(GRAPH_WRITING_KEY);
@@ -24,13 +29,26 @@ function jump(h){
   document.getElementById(h).scrollIntoView();
 }
 
+function getRenderStrongNode() {
+  var strong = localStorage.getItem(GRAPH_WRITING_OPTION_STRONG)
+  return !!strong
+}
+
+function setRenderStrongNode(use_strong) {
+  if (use_strong) {
+    localStorage.setItem(GRAPH_WRITING_OPTION_STRONG, 'true')
+  } else {
+    localStorage.removeItem(GRAPH_WRITING_OPTION_STRONG)
+  }
+}
+
 var getGraphData = function(callback) {
-  d3.text(content_url, function(text) {
-    $('#content_editor').val(text)
-
+  function parse(text, callback) {
     var tokens = converter.parse(text, {})
-
-    var parsed = Dependent.parse(tokens)
+    console.log(tokens)
+    var parsed = Dependent.parse(tokens, {
+      use_strong: getRenderStrongNode()
+    })
 
     function linkIndexOf(id, nodes) {
       var index;
@@ -44,15 +62,6 @@ var getGraphData = function(callback) {
       return index;
     }
 
-    $(".content-body").html(converter.render(text))
-
-    $('.content-body')
-    .children()
-    .each(function(e) {
-      $(this).css({position: 'relative'})
-      $(this).append($('<div class="marker">M</div>'))
-    })
-
     var links = parsed.links.map(function(p) {
       return {
         source: linkIndexOf(p.source, parsed.nodes),
@@ -60,34 +69,29 @@ var getGraphData = function(callback) {
       }
     }).filter(function(p) {
       return p['source'] != undefined && p['target'] != undefined
-    });
+    })
 
-    // console.log(parsed.nodes)
-    // console.log(parsed.links)
-    // console.log(links)
-
-    callback && callback(parsed.nodes, links)
-  })
+    callback && callback(parsed.nodes, links, text)
+  }
+  if (content_cache) {
+    parse(content_cache, callback);
+  } else {
+    d3.text(content_url, function(text) {
+      content_cache = text
+      parse(text, callback)
+    })
+  }
 }
 
 
-getGraphData(function(nodes, links) {
-
+getGraphData(function(nodes, links, text) {
   var r = 10;
   var graph, zoom;
   var graphWidth, graphHeight;
-  var history = [];
-  var history_ptr = 0;
   var tree;
-  var start;
 
   graphWidth = $('.graph').width() / 2;
   graphHeight = $('.graph').height();
-
-
-  var getTreeData = function(source) {
-    return buildTree(source);
-  };
 
   var buildTree = function(source) {
     var treeObj = {};
@@ -104,10 +108,9 @@ getGraphData(function(nodes, links) {
     return treeObj;
   };
 
-  function readNode(d) {
-
-    Tree.render(getTreeData(d));
-    jump(slugify(d.text, {lower: true}));
+  function readNode(node) {
+    Tree.render(buildTree(node));
+    jump(slugify(node.text, {lower: true}));
   }
 
   function readPrevNode() {
@@ -115,16 +118,16 @@ getGraphData(function(nodes, links) {
     if (history_ptr < 0) {
       history_ptr = 0
     } else {
-      readNode(history[history_ptr])
+      readNode(node_history[history_ptr])
     }
   }
 
   function readNextNode() {
     history_ptr += 1
-    if (history_ptr > history.length - 1) {
-      history_ptr = history.length - 1
+    if (history_ptr > node_history.length - 1) {
+      history_ptr = node_history.length - 1
     } else {
-      readNode(history[history_ptr]);
+      readNode(node_history[history_ptr]);
     }
   }
 
@@ -141,7 +144,7 @@ getGraphData(function(nodes, links) {
 
   function onControlZoomClicked(e) {
     var elmTarget = $(this)
-    var scaleProcentile = 0.20;
+    var scaleProcentile = 0.50;
 
     // Scale
     var currentScale = zoom.scale()
@@ -175,21 +178,40 @@ getGraphData(function(nodes, links) {
   zoom = d3.behavior.zoom();
   zoom.on("zoom", onZoomChanged);
 
-  function render() {
-    tree = Tree.render(getTreeData({"id":"machinelearning", text: "Machine Learning"}));
-    start = {"id":"machinelearning", text: "Machine Learning"};
+  function renderContent(text) {
+    $('#content_editor').val(text)
+    $(".content-body").html(converter.render(text))
+    $('.content-body')
+    .children()
+    .each(function(e) {
+      $(this).css({position: 'relative'})
+      $(this).append($('<div class="marker"><svg class="icon icon-files-empty"><use xlink:href="#icon-files-empty"></use></svg></div>'))
+    })
+  }
 
+  function renderGraph(nodes, links, start, zoom) {
+    tree = Tree.render(buildTree(start));
     graph = DAG.render({nodes: nodes, links: links}, zoom, function(d) {
-      if (d['id'] !== history[history.length - 1]['id']) {
-        history.push(d);
+      if (d['id'] !== node_history[node_history.length - 1]['id']) {
+        node_history.push(d);
         history_ptr += 1;
       }
       readNode(d);
     });
-
     readNode(start);
-    history = [];
-    history.push(start);
+    node_history = [];
+    node_history.push(start);
+  }
+
+  // setTimeout(function() {
+  //   DAG.focus(start);
+  // }, 2000)
+
+  renderContent(text)
+  renderGraph(nodes, links, start, zoom)
+
+  function attachToStash(mark) {
+    $('#marker_stash').append(mark)
   }
 
   function toggle_graph() {
@@ -197,25 +219,27 @@ getGraphData(function(nodes, links) {
     $('#tree').toggle()
     $('body').toggleClass('indexing')
   }
+
+  function toggle_setting() {
+    $('.modal.js').toggle()
+  }
+
   function toggle_tree() {
     $('#tree').toggle()
   }
+
   function toggle_edit() {
     $('#editor').toggle()
   }
 
-  function attachToStash(mark) {
-    $('#marker_stash').append(mark)
-  }
-  // setTimeout(function() {
-  //   DAG.focus(start);
-  // }, 2000)
-
-  render();
+  $('#control_panel #toggle_graph').on('click', toggle_graph)
+  $('#control_panel #content_back').on('click', readPrevNode)
+  $('#control_panel #content_forward').on('click', readNextNode)
+  $('#control_panel #toggle_setting').on('click', toggle_setting)
 
   $('#rerender').on('click', function(e) {
     saveContent();
-    render();
+    renderGraph();
     MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
   })
 
@@ -223,25 +247,22 @@ getGraphData(function(nodes, links) {
     if (e.target.nodeName !== 'A') return;
     var id = e.target.hash.replace('#', '');
     if (nodes.filter(function(n) { return n["id"] == id }).length > 0) {
-      if (id !== history[history.length - 1]['id']) {
-        history.push({"id": id});
+      if (id !== node_history[node_history.length - 1]['id']) {
+        node_history.push({"id": id});
         history_ptr += 1;
       }
       readNode({"id": id});
-      // console.log(history);
+      // console.log(node_history);
       // console.log(history_ptr);
     }
   })
 
   // $('#control_panel #toggle_tree').on('click', toggle_tree)
-  $('#control_panel #toggle_graph').on('click', toggle_graph)
-  $('#control_panel #content_back').on('click', readPrevNode)
-  $('#control_panel #content_forward').on('click', readNextNode)
 
 
   $('.content-body').on('click', function(e) {
-    if (e.target.className === 'marker') {
-      var mark = $(e.target).parent().clone()
+    if (e.target.parentNode.className === 'marker') {
+      var mark = $(e.target).parent().parent().clone()
       var close = $(mark).find('.marker')
       $(close).text('x')
       attachToStash(mark)
@@ -253,4 +274,19 @@ getGraphData(function(nodes, links) {
       $(e.target).parent().remove();
     }
   })
+
+  $('.modal.js .modal-close').on('click', function(e) {
+    getGraphData(function(nodes, links, text) {
+      renderGraph(nodes, links, start, zoom)
+    })
+    toggle_setting();
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+  })
+
+  $('#toggle_strong_node').on('click', function(e) {
+    setRenderStrongNode(e.target.checked)
+  })
+
+  $('#toggle_strong_node').attr({ checked: getRenderStrongNode()})
+
 })

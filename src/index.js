@@ -1,11 +1,12 @@
 (function(){
   var Dependent = {};
-  Dependent.parse = function(tokens) {
+  Dependent.parse = function(tokens, options) {
     var blocks = [];
     var links = [];
     var token_len = tokens.length;
     var block = null;
     var token = null;
+    var use_strong = options.use_strong
 
     function findLinks(inlines) {
       var inlines_len = inlines.length;
@@ -30,7 +31,10 @@
       for (var i = 0; i < inlines_len; ) {
         token = inlines[i];
         if (token.type === 'strong_open') {
-          _links.push({text: inlines[i+1]['content'], target: inlines[i+1]['content'].toLowerCase().replace(/\s/, '')})
+          _links.push({
+            target: slugify(inlines[i+1]['content'], {lower: true}),
+            text: inlines[i+1]['content']
+          })
           i += 2;
         } else {
           i++;
@@ -43,11 +47,13 @@
       token = tokens[i];
       var _children = [];
       if (token.type === 'heading_open' && token.tag[0] === 'h') {
-        _children = findStrong(tokens[i+1].children);
-        if (_children.length > 0) {
-          block = {id: _children[0]['target'], text: _children[0]['text']}
+        if (use_strong) {
+          _children = findStrong(tokens[i+1].children);
+          if (_children.length > 0) {
+            block = {id: _children[0]['target'], text: _children[0]['text']}
+          }
         } else {
-          // block = {id: tokens[i+1].content, text: tokens[i+1].content}
+          block = {id: slugify(tokens[i+1].content.replace(/\*\*/g, ''), {lower: true}), text: tokens[i+1].content.replace(/\*\*/g, '') }
         }
         blocks.push(block)
         i += 2
@@ -63,7 +69,7 @@
         i++;
       }
     }
-
+    console.log(blocks, links)
     return {
       nodes: blocks,
       links: links
