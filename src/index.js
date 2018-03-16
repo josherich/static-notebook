@@ -43,6 +43,26 @@
       return _links;
     }
 
+    function extractLink(parent, link) {
+      var result = {
+        source: block['id'],
+        text: link['text'],
+        target: link['target'],
+        type: 'url'
+      }
+      if (link['target'][0] === '#') {
+        result.type = 'hash'
+        result.target = link['target'].replace(/^#/, '')
+      } else {
+        result.block = {
+          id: link['target'],
+          text: link['text'],
+          url: link['target']
+        }
+      }
+      return result
+    }
+
     for (var i = 0; i < token_len; ) {
       token = tokens[i];
       var _children = [];
@@ -59,9 +79,14 @@
         i += 2
       } else if (token.type === 'inline') {
         _children = findLinks(token.children);
-        _children.map(function(c) {
+        _children.map(function(child) {
           if (block) {
-            links.push({source: block['id'], text: c['text'], target: c['target'].replace('#', '')})
+            var link = extractLink(block, child)
+            if (link.type === 'url') {
+              blocks.push(link.block)
+            }
+            links.push(link)
+            // links.push({source: block['id'], text: c['text'], target: c['target'].replace('#', '')})
           }
         });
         i++;

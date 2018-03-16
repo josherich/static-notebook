@@ -11,9 +11,10 @@ var GRAPH_WRITING_OPTION_STRONG = 'GRAPH_WRITING_OPTION_STRONG';
 var SCALE_MAX = 2;
 var SCALE_MIN = 0.5;
 // var content_url = './src/data.md'
-var content_url = './src/introduction.md'
+// var content_url = './src/introduction.md'
 // var content_url = './src/linux-bootstrap-1.md'
-// var content_url = './src/docs/linux-insides-master/Booting/linux-bootstrap-2.md'
+
+var content_url = 'https://raw.githubusercontent.com/0xAX/linux-insides/master/Theory/linux-theory-3.md'
 var content_cache = null;
 var node_history = [];
 var history_ptr = 0;

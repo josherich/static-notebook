@@ -84,7 +84,7 @@
 
   // Helpers
   function formatClassName(prefix, object) {
-    return prefix + '-' + object.id.replace(/(\.|\/)/gi, '-');
+    return prefix + '-' + slugify(object.text, {lower: true}).replace(/[^\w]/g, '')
   }
 
   function findElementByNode(prefix, node) {

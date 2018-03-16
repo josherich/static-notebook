@@ -553,15 +553,6 @@ Feb 21:  introduction to Grothendieck inequality and a proof of an upper bound o
 
 Feb 28:  calculate the Lovasz theta function for n-cycle and discuss connection with Grothendieck constant on graph
 
-## **Ramsey number**
-
-A natural question is whether it is possible to have arbitrarily large graphs without cliques (and without its complement having cliques), Ramsey answer this question in the negative in 1928 [Ram28]
-
-> We say an event happens with high probability if its probability is ≥ 1 − n−Ω(1)
-
-### Spencer 94
-
-> “Erd ̋os asks us to imagine an alien force, vastly more powerful than us, landing on Earth and demanding the value of R(5) or they will destroy our planet. In that case, he claims, we should marshal all our computers and all our mathematicians and attempt to find the value. But suppose, instead, that they ask for R(6). In that case, he believes, we should attempt to destroy the aliens.”
 
 ## **Clique**
 
@@ -571,11 +562,41 @@ A clique of a graph G is a subset S of its nodes such that the subgraph correspo
 
 An independence set of a graph G is a subset S of its nodes such that no two nodes in S share an edge. Equivalently it is a clique of the complement graph Gc := (V, Ec). The independence number of G is simply the clique number of Sc.
 
+## Ramsey number
+
+A natural question is whether it is possible to have arbitrarily large graphs without cliques (and without its complement having cliques), Ramsey answer this question in the negative in 1928 [Ram28]
+
+It is easy to show that R(3) = 6
+
+## high probability
+
+> We say an event happens with high probability if its probability is ≥ 1 − n−Ω(1)
+
+### Spencer 94 about Ramsey number
+
+> “Erdos asks us to imagine an alien force, vastly more powerful than us, landing on Earth and demanding the value of R(5) or they will destroy our planet. In that case, he claims, we should marshal all our computers and all our mathematicians and attempt to find the value. But suppose, instead, that they ask for R(6). In that case, he believes, we should attempt to destroy the aliens.”
+
+## Erdos-Renyi graph
+
+Given n and p, the random Erdos-Renyi graph G(n,p) is a random graph on n vertices where each possible edge appears, independently, with probability p.
+
+## theorem lower bound of R(r)
+
+For every r >= 2,
+$$R(r) \geq 2^{\frac{r-1}{2}}$$
+
+## Probabilistic method on graph
+
+$$\mathbb{E} \lbrack \mathbf{X(S)} \rbrack = Prob \lbrace \text{S is a clique or independent set} \rbrace = \frac{2}{2^{\left( S \atop 2 \right) }}$$
+
+## best known lower bound
+
 ## Erdos-Hajnal Conjecture
 For any finite graph H, there exists a constant $\delta H > 0$ such that any graph on n nodes that does
 not contain H as a subgraph (is a H-free graph) must have
 
 $$r(G) \geq n^{\delta^H}$$
+
 
 ## max-cut problem
 
@@ -622,6 +643,22 @@ $$u_j = \sum_{k=1}^N e^{2\pi ijk/N}\omega_k$$
 
 ### **degenerate kernel**
 
+## PL 2018
+
+## parameter passing
+
+- call by name
+- call by value
+- call by reference
+- call by value result
+
+# JavaScript
+
+## CJK regexp
+
+```
+/[\u4E00-\u9FCC\u3400-\u4DB5\uFA0E\uFA0F\uFA11\uFA13\uFA14\uFA1F\uFA21\uFA23\uFA24\uFA27-\uFA29]|[\ud840-\ud868][\udc00-\udfff]|\ud869[\udc00-\uded6\udf00-\udfff]|[\ud86a-\ud86c][\udc00-\udfff]|\ud86d[\udc00-\udf34\udf40-\udfff]|\ud86e[\udc00-\udc1d]/
+```
 
 # **New Words**
 Their experience in the transformative growth of the __ride-hailing__ industry helped __pollinate__ China’s next internet-enabled transportation revolution.
