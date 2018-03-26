@@ -94,7 +94,6 @@
         i++;
       }
     }
-    console.log(blocks, links)
     return {
       nodes: blocks,
       links: links
