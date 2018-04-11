@@ -261,9 +261,13 @@ const startup = function(filepath, cache=true) {
     })
 
     $('.modal.js .modal-close').on('click', function(e) {
-      getGraphData(function(nodes, links, text) {
+      SemanticDocs.data(filepath, getRenderStrongNode())
+      .then(data => {
+        let nodes = data.nodes
+        let links = data.links
         renderGraph(nodes, links, start, zoom)
       })
+
       toggle_setting();
       MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
     })

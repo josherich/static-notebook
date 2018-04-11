@@ -162,8 +162,8 @@ SemanticDocs.data = (filepath, use_strong) => {
     }
   }
 
-  if (content_cache && use_cache) {
-    return Promise((resolve, reject) => {
+  if (content_cache) {
+    return new Promise((resolve, reject) => {
       resolve(parse(content_cache))
     })
   } else {
