@@ -1,3 +1,4 @@
+// this file is based on https://github.com/markdown-it/markdown-it-footnote
 'use strict';
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -72,7 +73,7 @@ function render_footnote_anchor(tokens, idx, options, env, slf) {
 }
 
 
-window.footnote_plugin = function(md) {
+const footnote_plugin = function(md) {
   var parseLinkLabel = md.helpers.parseLinkLabel,
       isSpace = md.utils.isSpace;
 
@@ -360,3 +361,5 @@ window.footnote_plugin = function(md) {
   md.inline.ruler.after('footnote_inline', 'footnote_ref', footnote_ref);
   md.core.ruler.after('inline', 'footnote_tail', footnote_tail);
 };
+
+export default footnote_plugin

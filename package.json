@@ -1,0 +1,38 @@
+{
+  "name": "semantic-docs",
+  "version": "0.0.1",
+  "description": "parsing and browsing documents powered by NLP",
+  "main": "index.js",
+  "scripts": {
+    "buildapp": "rollup -c rollup.config.app.js",
+    "build": "rollup -c",
+    "prepublish": "uglifyjs -b beautify=false, dist/semantic-docs.js -c -m -o dist/semantic-docs.min.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/josherich/dependent-writing.git"
+  },
+  "keywords": [
+    "markdown",
+    "nlp"
+  ],
+  "author": "josherich",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/josherich/dependent-writing/issues"
+  },
+  "homepage": "https://github.com/josherich/dependent-writing#readme",
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-minify": "^0.4.0",
+    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-preset-env": "^1.6.1",
+    "eslint": "^4.19.1",
+    "rollup": "^0.57.1",
+    "rollup-plugin-babel": "^3.0.3",
+    "uglify-js": "^3.3.18"
+  },
+  "dependencies": {
+    "markdown-it": "^8.4.1"
+  }
+}

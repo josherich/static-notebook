@@ -2,8 +2,7 @@
 
 demo: https://josherich.github.io/dependent-writing
 
-Writing technical article with DAG and Trees
-
+Writing notes with DAG and index
 
 ## inspired by:
 
@@ -12,9 +11,3 @@ Writing technical article with DAG and Trees
 - https://github.com/auchenberg/dependo
 
 - [VoodooPad](voodoopad.com)
-
-## reference
-
-- https://github.com/sindresorhus/github-markdown-css/blob/gh-pages/github-markdown.css
-
-- https://github.com/simov/slugify/blob/master/index.js

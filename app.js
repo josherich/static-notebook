@@ -1,0 +1,1 @@
+export { default as demo } from "./src/app";

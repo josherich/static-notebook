@@ -2,26 +2,24 @@ MathJax.Hub.Config({
   tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
 });
 
-var converter = markdownit();
-anchor(converter, {})
-footnote_plugin(converter)
+import SemanticDocs from './index'
+import DAG from './dag'
 
-var GRAPH_WRITING_KEY = 'GRAPH_WRITING_CONTENT_TMP';
-var GRAPH_WRITING_OPTION_STRONG = 'GRAPH_WRITING_OPTION_STRONG';
-var SCALE_MAX = 2;
-var SCALE_MIN = 0.5;
-var content_cache = null;
-var node_history = [];
-var history_ptr = 0;
-var start = null;
-var use_cache = true;
+let GRAPH_WRITING_KEY = 'GRAPH_WRITING_CONTENT_TMP';
+let GRAPH_WRITING_OPTION_STRONG = 'GRAPH_WRITING_OPTION_STRONG';
+let SCALE_MAX = 2;
+let SCALE_MIN = 0.5;
+let node_history = [];
+let history_ptr = 0;
+let start = null;
+let use_cache = true;
 
 function loadContent() {
   return window.localStorage.getItem(GRAPH_WRITING_KEY);
 }
 
 function saveContent() {
-  var content = $('#content_editor').val();
+  let content = $('#content_editor').val();
   window.localStorage.setItem(GRAPH_WRITING_KEY, content);
 }
 
@@ -30,7 +28,7 @@ function jump(h){
 }
 
 function getRenderStrongNode() {
-  var strong = localStorage.getItem(GRAPH_WRITING_OPTION_STRONG)
+  let strong = localStorage.getItem(GRAPH_WRITING_OPTION_STRONG)
   return !!strong
 }
 
@@ -42,60 +40,27 @@ function setRenderStrongNode(use_strong) {
   }
 }
 
-var getGraphData = function(filepath, callback) {
-  function parse(text, callback) {
-    var tokens = converter.parse(text, {})
-    var parsed = Dependent.parse(tokens, {
-      use_strong: getRenderStrongNode()
-    })
-
-    function linkIndexOf(id, nodes) {
-      var index;
-      nodes.map(function(n, i) {
-        if (n == null) {
-          index = 'NA'
-        } else if (n.id === id) {
-          index = i
-        }
-      });
-      return index;
-    }
-
-    var links = parsed.links.map(function(p) {
-      return {
-        source: linkIndexOf(p.source, parsed.nodes),
-        target: linkIndexOf(p.target, parsed.nodes)
-      }
-    }).filter(function(p) {
-      return p['source'] != undefined && p['target'] != undefined
-    })
-
-    callback && callback(parsed.nodes, links, text)
-  }
-  if (content_cache && use_cache) {
-    parse(content_cache, callback);
-  } else {
-    d3.text(filepath, function(text) {
-      content_cache = text
-      parse(text, callback)
-    })
-  }
-}
-
-window.pageone = function(filepath, cache=true) {
+const startup = function(filepath, cache=true) {
   use_cache = cache;
-  getGraphData(filepath, function(nodes, links, text) {
-    var r = 10;
-    var graph, zoom;
-    var graphWidth, graphHeight;
-    var tree;
 
-    graphWidth = $('.graph').width() / 2;
+  SemanticDocs.data(filepath, getRenderStrongNode())
+  .then(data => {
+    let nodes = data.nodes
+    let links = data.links
+    let index = data.index
+    let text = data.text
+
+    let r = 10;
+    let graph, zoom;
+    let graphWidth, graphHeight;
+    let tree;
+
+    graphWidth = $('.graph').width();
     graphHeight = $('.graph').height();
 
-    var buildTree = function(source) {
-      var treeObj = {};
-      var children = [];
+    let buildTree = function(source) {
+      let treeObj = {};
+      let children = [];
 
       treeObj["name"] = source.id;
       treeObj["content"] = source.text;
@@ -108,9 +73,19 @@ window.pageone = function(filepath, cache=true) {
       return treeObj;
     };
 
+    let buildIndex = index => {
+      let frag = document.createDocumentFragment()
+      index.map((node, idx) => {
+        if (node.type === 'heading_open') {
+          frag.appendChild($(`<div class=${node.tag}><a href="#${node.attrs[0][1]}">${index[idx + 1].content}</a></div>`)[0])
+        }
+      })
+      $('#index').append(frag)
+    }
+
     function readNode(node) {
-      Tree.render(buildTree(node));
-      jump(slugify(node.text, {lower: true}));
+      // Tree.render(buildTree(node));
+      jump(SemanticDocs.slugify(node.text, {lower: true}))
     }
 
     function readPrevNode() {
@@ -132,7 +107,7 @@ window.pageone = function(filepath, cache=true) {
     }
 
     function onZoomChanged() {
-      var scale = d3.event.scale
+      let scale = d3.event.scale
       // if (scale > SCALE_MAX) {
       //   scale = SCALE_MAX;
       // }
@@ -143,12 +118,12 @@ window.pageone = function(filepath, cache=true) {
     }
 
     function onControlZoomClicked(e) {
-      var elmTarget = $(this)
-      var scaleProcentile = 0.50;
+      let elmTarget = $(this)
+      let scaleProcentile = 0.50;
 
       // Scale
-      var currentScale = zoom.scale()
-      var newScale
+      let currentScale = zoom.scale()
+      let newScale
       if(elmTarget.hasClass('control-zoom-in')) {
         newScale = currentScale * (1 + scaleProcentile)
       } else {
@@ -157,7 +132,10 @@ window.pageone = function(filepath, cache=true) {
       newScale = Math.max(newScale, 0)
 
       // Translate
-      var centerTranslate = [
+      graphWidth = $('.graph').width();
+      graphHeight = $('.graph').height();
+
+      let centerTranslate = [
         (graphWidth / 2) - (graphWidth * newScale / 2),
         (graphHeight / 2) - (graphHeight * newScale / 2)
       ];
@@ -179,8 +157,8 @@ window.pageone = function(filepath, cache=true) {
     zoom.on("zoom", onZoomChanged);
 
     function renderContent(text) {
-      $('#content_editor').val(text)
-      $(".content-body").html(converter.render(text))
+      // $('#content_editor').val(text)
+      $(".content-body").html(text)
       $('.content-body')
       .children()
       .each(function(e) {
@@ -191,7 +169,7 @@ window.pageone = function(filepath, cache=true) {
 
     function renderGraph(nodes, links, start, zoom) {
       start = nodes[0]
-      tree = Tree.render(buildTree(start));
+      // tree = Tree.render(buildTree(start));
       graph = DAG.render({nodes: nodes, links: links}, zoom, function(d) {
         if (d['id'] !== node_history[node_history.length - 1]['id']) {
           node_history.push(d);
@@ -213,14 +191,16 @@ window.pageone = function(filepath, cache=true) {
 
     renderGraph(nodes, links, start, zoom)
 
+    buildIndex(index)
+
     function attachToStash(mark) {
       $('#marker_stash').append(mark)
     }
 
     function toggle_graph() {
-      $('#graph').toggle()
-      $('#tree').toggle()
-      $('body').toggleClass('indexing')
+      // $('#graph').toggle()
+      $('body').removeClass('index_visible')
+      $('body').toggleClass('graph_visible')
     }
 
     function toggle_setting() {
@@ -231,11 +211,18 @@ window.pageone = function(filepath, cache=true) {
       $('#tree').toggle()
     }
 
+    function toggle_index() {
+      // $('#index').toggle()
+      $('body').removeClass('graph_visible')
+      $('body').toggleClass('index_visible')
+    }
+
     function toggle_edit() {
       $('#editor').toggle()
     }
 
     $('#control_panel #toggle_graph').on('click', toggle_graph)
+    $('#control_panel #toggle_index').on('click', toggle_index)
     $('#control_panel #content_back').on('click', readPrevNode)
     $('#control_panel #content_forward').on('click', readNextNode)
     $('#control_panel #toggle_setting').on('click', toggle_setting)
@@ -248,25 +235,20 @@ window.pageone = function(filepath, cache=true) {
 
     $('.content').on('click', function(e) {
       if (e.target.nodeName !== 'A') return;
-      var id = e.target.hash.replace('#', '');
+      let id = e.target.hash.replace('#', '');
       if (nodes.filter(function(n) { return n["id"] == id }).length > 0) {
         if (id !== node_history[node_history.length - 1]['id']) {
           node_history.push({"id": id});
           history_ptr += 1;
         }
         readNode({"id": id});
-        // console.log(node_history);
-        // console.log(history_ptr);
       }
     })
 
-    // $('#control_panel #toggle_tree').on('click', toggle_tree)
-
-
     $('.content-body').on('click', function(e) {
       if (e.target.parentNode.className === 'marker') {
-        var mark = $(e.target).parent().parent().clone()
-        var close = $(mark).find('.marker')
+        let mark = $(e.target).parent().parent().clone()
+        let close = $(mark).find('.marker')
         $(close).text('x')
         attachToStash(mark)
       }
@@ -294,3 +276,5 @@ window.pageone = function(filepath, cache=true) {
 
   })
 }
+
+export default startup
