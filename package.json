@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "buildapp": "rollup -c rollup.config.app.js",
-    "build": "rollup -c",
-    "prepublish": "uglifyjs -b beautify=false, dist/semantic-docs.js -c -m -o dist/semantic-docs.min.js"
+    "build": "rollup -c"
   },
   "repository": {
     "type": "git",
@@ -23,7 +22,7 @@
   },
   "homepage": "https://github.com/josherich/dependent-writing#readme",
   "devDependencies": {
-    "babel-core": "^6.26.0",
+    "babel-core": "^6.26.3",
     "babel-minify": "^0.4.0",
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-preset-es2015-rollup": "^3.0.0",
@@ -33,6 +32,7 @@
     "rollup-plugin-babel": "^3.0.3"
   },
   "dependencies": {
+    "@shopify/draggable": "^1.0.0-beta.8",
     "markdown-it": "^8.4.1"
   }
 }

@@ -11,3 +11,7 @@ Writing notes with DAG and index
 - https://github.com/auchenberg/dependo
 
 - [VoodooPad](voodoopad.com)
+
+## Build
+
+## Develop

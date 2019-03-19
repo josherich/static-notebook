@@ -1,1 +1,1 @@
-export { default as semanticdocs } from "./src/index";
+export { default as semanticdocs } from "./src/app/index";

@@ -1,1 +1,1 @@
-export { default as demo } from "./src/app";
+export { default as demo } from "./src/app/main";

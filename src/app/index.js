@@ -2,14 +2,22 @@ import markdownit from 'markdown-it'
 import anchor_plugin from './anchor'
 import footnote_plugin from './footnote'
 
+let content_cache = null
 let converter = markdownit()
 anchor_plugin(converter, {})
 footnote_plugin(converter)
-let content_cache = null
 
 const slugify = anchor_plugin.defaults.slugify
 
-let SemanticDocs = {}
+let SemanticDocs = {
+  sync: null
+}
+
+SemanticDocs.config = function(opt) {
+  SemanticDocs.sync = opt.sync
+}
+
+SemanticDocs.slugify = slugify
 
 SemanticDocs.parse = function(tokens, options) {
   let blocks = []
@@ -168,17 +176,14 @@ SemanticDocs.data = (filepath, use_strong) => {
     })
   } else {
     let tasks = []
-    if (Array.isArray(filepath)) {
-      filepath.map(file => {
-        tasks.push(new Promise((resolve, reject) => {
-          d3.text(file, text => { resolve(text) })
-        }))
-      })
-    } else {
-      tasks = [new Promise((resolve, reject) => {
-        d3.text(file, text => { resolve(text) })
-      })]
+    if (!Array.isArray(filepath)) {
+      filepath = [filepath]
     }
+
+    filepath.map(file => {
+      tasks.push(SemanticDocs.sync.get(file))
+    })
+
     return Promise.all(tasks)
       .then(textArray => {
         let alltext = textArray.join('\n')
@@ -187,7 +192,5 @@ SemanticDocs.data = (filepath, use_strong) => {
       })
   }
 }
-
-SemanticDocs.slugify = slugify
 
 export default SemanticDocs

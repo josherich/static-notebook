@@ -1,30 +1,34 @@
 MathJax.Hub.Config({
   tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
-});
+})
 
 import SemanticDocs from './index'
 import DAG from './dag'
+import firebase from './adapter-firebase'
 
-let GRAPH_WRITING_KEY = 'GRAPH_WRITING_CONTENT_TMP';
-let GRAPH_WRITING_OPTION_STRONG = 'GRAPH_WRITING_OPTION_STRONG';
-let SCALE_MAX = 2;
-let SCALE_MIN = 0.5;
-let node_history = [];
-let history_ptr = 0;
-let start = null;
-let use_cache = true;
+let GRAPH_WRITING_KEY = 'GRAPH_WRITING_CONTENT_TMP'
+let GRAPH_WRITING_OPTION_STRONG = 'GRAPH_WRITING_OPTION_STRONG'
+let markerString = '<div class="marker"><svg class="icon icon-files-empty"><use xlink:href="#icon-files-empty"></use></svg></div>'
+let draggerString = '<div class="dragger"><div class="clearfix pbs"><svg class="icon icon-more_vert"><use xlink:href="#icon-more_vert"></use></svg></div></div>'
 
+let SCALE_MAX = 2
+let SCALE_MIN = 0.5
+let node_history = []
+let history_ptr = 0
+let start = null
+let use_cache = true
+  
 function loadContent() {
-  return window.localStorage.getItem(GRAPH_WRITING_KEY);
+  return window.localStorage.getItem(GRAPH_WRITING_KEY)
 }
 
 function saveContent() {
-  let content = $('#content_editor').val();
-  window.localStorage.setItem(GRAPH_WRITING_KEY, content);
+  let content = $('#content_editor').val()
+  window.localStorage.setItem(GRAPH_WRITING_KEY, content)
 }
 
 function jump(h){
-  document.getElementById(h).scrollIntoView();
+  document.getElementById(h).scrollIntoView()
 }
 
 function getRenderStrongNode() {
@@ -40,8 +44,38 @@ function setRenderStrongNode(use_strong) {
   }
 }
 
-const startup = function(filepath, cache=true) {
-  use_cache = cache;
+function setSortable() {
+  const containerSelector = '.content-body';
+  const containers = document.querySelectorAll(containerSelector);
+
+  if (containers.length === 0) {
+    return false;
+  }
+
+  const sortable = new Draggable.Sortable(containers, {
+    draggable: '.drag-item',
+    handle: '.dragger',
+    mirror: {
+      appendTo: containerSelector,
+      constrainDimensions: true,
+    },
+  });
+}
+
+const startup = function(filepath, adapterType, storageRef, cache=true) {
+  use_cache = cache
+  let adapter = null
+
+  if (adapterType == 'firebase') {
+    adapter = firebase
+    firebase.config({
+      storageRef: storageRef
+    })
+  }
+
+  SemanticDocs.config({
+    sync: adapter
+  })
 
   SemanticDocs.data(filepath, getRenderStrongNode())
   .then(data => {
@@ -50,28 +84,28 @@ const startup = function(filepath, cache=true) {
     let index = data.index
     let text = data.text
 
-    let r = 10;
-    let graph, zoom;
-    let graphWidth, graphHeight;
-    let tree;
+    let r = 10
+    let graph, zoom
+    let graphWidth, graphHeight
+    let tree
 
-    graphWidth = $('.graph').width();
-    graphHeight = $('.graph').height();
+    graphWidth = $('.graph').width()
+    graphHeight = $('.graph').height()
 
     let buildTree = function(source) {
-      let treeObj = {};
-      let children = [];
+      let treeObj = {}
+      let children = []
 
-      treeObj["name"] = source.id;
-      treeObj["content"] = source.text;
+      treeObj["name"] = source.id
+      treeObj["content"] = source.text
       links.map(function(link, index) {
         if (link.source.id == source.id) {
-          children.push(link.target);
+          children.push(link.target)
         }
-      });
-      treeObj["children"] = children.map(buildTree);
-      return treeObj;
-    };
+      })
+      treeObj["children"] = children.map(buildTree)
+      return treeObj
+    }
 
     let buildIndex = index => {
       let frag = document.createDocumentFragment()
@@ -84,8 +118,8 @@ const startup = function(filepath, cache=true) {
     }
 
     function readNode(node) {
-      // Tree.render(buildTree(node));
-      jump(SemanticDocs.slugify(node.text, {lower: true}))
+      // Tree.render(buildTree(node))
+      jump(SemanticDocs.slugify(node.id, {lower: true}))
     }
 
     function readPrevNode() {
@@ -102,24 +136,24 @@ const startup = function(filepath, cache=true) {
       if (history_ptr > node_history.length - 1) {
         history_ptr = node_history.length - 1
       } else {
-        readNode(node_history[history_ptr]);
+        readNode(node_history[history_ptr])
       }
     }
 
     function onZoomChanged() {
       let scale = d3.event.scale
       // if (scale > SCALE_MAX) {
-      //   scale = SCALE_MAX;
+      //   scale = SCALE_MAX
       // }
       // if (scale < SCALE_MIN) {
-      //   scale = SCALE_MIN;
+      //   scale = SCALE_MIN
       // }
       graph.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + scale + ")")
     }
 
     function onControlZoomClicked(e) {
       let elmTarget = $(this)
-      let scaleProcentile = 0.50;
+      let scaleProcentile = 0.50
 
       // Scale
       let currentScale = zoom.scale()
@@ -132,18 +166,17 @@ const startup = function(filepath, cache=true) {
       newScale = Math.max(newScale, 0)
 
       // Translate
-      graphWidth = $('.graph').width();
-      graphHeight = $('.graph').height();
+      graphWidth = $('.graph').width()
+      graphHeight = $('.graph').height()
 
       let centerTranslate = [
         (graphWidth / 2) - (graphWidth * newScale / 2),
         (graphHeight / 2) - (graphHeight * newScale / 2)
-      ];
+      ]
 
       // Store values
-      zoom
-        .translate(centerTranslate)
-        .scale(newScale)
+      zoom.translate(centerTranslate)
+          .scale(newScale)
 
       // Render transition
       graph.transition()
@@ -151,43 +184,46 @@ const startup = function(filepath, cache=true) {
         .attr("transform", "translate(" + zoom.translate() + ")" + " scale(" + zoom.scale() + ")")
     }
 
-    $('.control-zoom a').on('click', onControlZoomClicked);
+    $('.control-zoom a').on('click', onControlZoomClicked)
 
-    zoom = d3.behavior.zoom();
-    zoom.on("zoom", onZoomChanged);
+    zoom = d3.behavior.zoom()
+    zoom.on("zoom", onZoomChanged)
 
     function renderContent(text) {
-      // $('#content_editor').val(text)
       $(".content-body").html(text)
       $('.content-body')
       .children()
       .each(function(e) {
-        $(this).css({position: 'relative'})
-        $(this).append($('<div class="marker"><svg class="icon icon-files-empty"><use xlink:href="#icon-files-empty"></use></svg></div>'))
+        $(this).append($(markerString))
+        $(this).append($(draggerString))
+        $(this).addClass('drag-item')
+        $(this).attr('contentEditable', true)
       })
     }
 
     function renderGraph(nodes, links, start, zoom) {
       start = nodes[0]
-      // tree = Tree.render(buildTree(start));
+      // tree = Tree.render(buildTree(start))
       graph = DAG.render({nodes: nodes, links: links}, zoom, function(d) {
         if (d['id'] !== node_history[node_history.length - 1]['id']) {
-          node_history.push(d);
-          history_ptr += 1;
+          node_history.push(d)
+          history_ptr += 1
         }
-        readNode(d);
-      });
-      readNode(start);
-      node_history = [];
-      node_history.push(start);
+        readNode(d)
+      })
+      readNode(start)
+      node_history = []
+      node_history.push(start)
     }
 
     // setTimeout(function() {
-    //   DAG.focus(start);
+    //   DAG.focus(start)
     // }, 2000)
 
     renderContent(text)
-    MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+    setSortable()
+    MathJax.Hub.Queue(["Typeset",MathJax.Hub])
+    // $('.content-body p').attr({'contentEditable': true})
 
     renderGraph(nodes, links, start, zoom)
 
@@ -228,20 +264,28 @@ const startup = function(filepath, cache=true) {
     $('#control_panel #toggle_setting').on('click', toggle_setting)
 
     $('#rerender').on('click', function(e) {
-      saveContent();
-      renderGraph();
-      MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+      saveContent()
+      renderGraph()
+      MathJax.Hub.Queue(["Typeset",MathJax.Hub])
+    })
+
+    $('#save').on('click', function(e) {
+      saveChanged()
+    })
+
+    $('#login').on('click', function(e) {
+      login()
     })
 
     $('.content').on('click', function(e) {
-      if (e.target.nodeName !== 'A') return;
-      let id = e.target.hash.replace('#', '');
+      if (e.target.nodeName !== 'A') return
+      let id = e.target.hash.replace('#', '')
       if (nodes.filter(function(n) { return n["id"] == id }).length > 0) {
         if (id !== node_history[node_history.length - 1]['id']) {
-          node_history.push({"id": id});
-          history_ptr += 1;
+          node_history.push({"id": id})
+          history_ptr += 1
         }
-        readNode({"id": id});
+        readNode({"id": id})
       }
     })
 
@@ -256,7 +300,7 @@ const startup = function(filepath, cache=true) {
 
     $('#marker_stash').on('click', function(e) {
       if (e.target.className === 'marker') {
-        $(e.target).parent().remove();
+        $(e.target).parent().remove()
       }
     })
 
@@ -268,8 +312,8 @@ const startup = function(filepath, cache=true) {
         renderGraph(nodes, links, start, zoom)
       })
 
-      toggle_setting();
-      MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+      toggle_setting()
+      MathJax.Hub.Queue(["Typeset", MathJax.Hub])
     })
 
     $('#toggle_strong_node').on('click', function(e) {

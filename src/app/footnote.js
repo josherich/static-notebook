@@ -1,9 +1,6 @@
 // this file is based on https://github.com/markdown-it/markdown-it-footnote
 'use strict';
 
-////////////////////////////////////////////////////////////////////////////////
-// Renderer partials
-
 function render_footnote_anchor_name(tokens, idx, options, env/*, slf*/) {
   var n = Number(tokens[idx].meta.id + 1).toString();
   var prefix = '';

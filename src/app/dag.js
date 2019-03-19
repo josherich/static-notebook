@@ -104,7 +104,7 @@ function fadeRelatedNodes(d, opacity, nodes, links) {
   $('path.link').removeAttr('data-show');
 
   nodes.style("stroke-opacity", function(o) {
-
+    let thisOpacity = 1;
     if (isConnected(d, o)) {
       thisOpacity = 1;
     } else {

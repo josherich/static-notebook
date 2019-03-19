@@ -131,6 +131,7 @@ div + .h1 {
 }
 
 .content-body {
+  position: relative;
   width: 50%;
   height: 100%;
   margin: 0 auto;
@@ -396,4 +397,53 @@ path.link.resolved {
 
 .modal-close:hover {
   color: #333;
+}
+
+#firebaseui-auth-container {
+  display: none;
+  position: absolute;
+  width: 100%;
+  background: white;
+  z-index: 99999;
+  box-shadow: 0 0 9px 1px rgba(0,0,0,0.1);
+  padding: 40px 0;
+}
+
+#signin {
+  display: none;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  cursor: pointer;
+}
+
+#save {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  cursor: pointer;
+}
+
+.drag-item {
+  position: relative;
+  padding-left: 20px;
+}
+
+.drag-item:hover .dragger {
+  display: block;
+}
+
+.dragger {
+  display: none;
+  background: rgba(0,0,0,0.1);
+  border-radius: 2px;
+  position: absolute;
+  left: -10px;
+  top: 0;
+}
+
+.draggable-source--is-dragging {
+  border: 2px dashed rgba(0,0,0,0.1);
+  box-sizing: border-box;
 }

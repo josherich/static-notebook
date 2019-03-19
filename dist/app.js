@@ -1,8 +1,8 @@
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('markdown-it')) :
   typeof define === 'function' && define.amd ? define(['exports', 'markdown-it'], factory) :
-  (factory((global.sd = global.sd || {}),global.markdownit));
-}(this, (function (exports,markdownit) { 'use strict';
+  (global = global || self, factory(global.sd = global.sd || {}, global.markdownit));
+}(this, function (exports, markdownit) { 'use strict';
 
   markdownit = markdownit && markdownit.hasOwnProperty('default') ? markdownit['default'] : markdownit;
 
@@ -138,9 +138,6 @@
   };
 
   // this file is based on https://github.com/markdown-it/markdown-it-footnote
-
-  ////////////////////////////////////////////////////////////////////////////////
-  // Renderer partials
 
   function render_footnote_anchor_name(tokens, idx, options, env/*, slf*/) {
     var n = Number(tokens[idx].meta.id + 1).toString();
@@ -500,14 +497,22 @@
     md.core.ruler.after('inline', 'footnote_tail', footnote_tail);
   };
 
+  let content_cache = null;
   let converter = markdownit();
   anchor_plugin(converter, {});
   footnote_plugin(converter);
-  let content_cache = null;
 
   const slugify$1 = anchor_plugin.defaults.slugify;
 
-  let SemanticDocs = {};
+  let SemanticDocs = {
+    sync: null
+  };
+
+  SemanticDocs.config = function(opt) {
+    SemanticDocs.sync = opt.sync;
+  };
+
+  SemanticDocs.slugify = slugify$1;
 
   SemanticDocs.parse = function(tokens, options) {
     let blocks = [];
@@ -666,17 +671,14 @@
       })
     } else {
       let tasks = [];
-      if (Array.isArray(filepath)) {
-        filepath.map(file => {
-          tasks.push(new Promise((resolve, reject) => {
-            d3.text(file, text => { resolve(text); });
-          }));
-        });
-      } else {
-        tasks = [new Promise((resolve, reject) => {
-          d3.text(file, text => { resolve(text); });
-        })];
+      if (!Array.isArray(filepath)) {
+        filepath = [filepath];
       }
+
+      filepath.map(file => {
+        tasks.push(SemanticDocs.sync.get(file));
+      });
+
       return Promise.all(tasks)
         .then(textArray => {
           let alltext = textArray.join('\n');
@@ -685,8 +687,6 @@
         })
     }
   };
-
-  SemanticDocs.slugify = slugify$1;
 
   // this file is based on https://github.com/auchenberg/dependo
 
@@ -793,7 +793,7 @@
     $('path.link').removeAttr('data-show');
 
     nodes.style("stroke-opacity", function(o) {
-
+      let thisOpacity = 1;
       if (isConnected(d, o)) {
         thisOpacity = 1;
       } else {
@@ -981,12 +981,55 @@
 
   DAG.focus = focus;
 
+  let sync = {
+    storageRef: null
+  };
+
+  sync.config = function(opt) {
+    sync.storageRef = opt.storageRef;
+  };
+
+  sync.get = function(file, resolve) {
+    let fileRef = sync.storageRef.child(file);
+    // Get the download URL
+    return fileRef.getDownloadURL().then(function(url) {
+        return fetch(url).then(response => response.text())
+      }).catch(function(error) {
+        switch (error.code) {
+          case 'storage/object-not-found':
+            console.log("File doesn't exist");
+            break
+
+          case 'storage/unauthorized':
+            console.log("User doesn't have permission to access the object");
+            break
+
+          case 'storage/canceled':
+            console.log("User canceled the upload");
+            break
+
+          case 'storage/unknown':
+            console.log("Unknown error occurred, inspect the server response");
+            break
+        }
+      })
+  };
+
+  sync.set = function(string, file) {
+    let fileRef = sync.storageRef.child(file);
+    fileRef.putString(string).then(function() {
+      console.log('Uploaded');
+    });
+  };
+
   MathJax.Hub.Config({
     tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
   });
 
   let GRAPH_WRITING_KEY = 'GRAPH_WRITING_CONTENT_TMP';
   let GRAPH_WRITING_OPTION_STRONG = 'GRAPH_WRITING_OPTION_STRONG';
+  let markerString = '<div class="marker"><svg class="icon icon-files-empty"><use xlink:href="#icon-files-empty"></use></svg></div>';
+  let draggerString = '<div class="dragger"><div class="clearfix pbs"><svg class="icon icon-more_vert"><use xlink:href="#icon-more_vert"></use></svg></div></div>';
   let node_history = [];
   let history_ptr = 0;
   let start = null;
@@ -1013,7 +1056,37 @@
     }
   }
 
-  const startup = function(filepath, cache=true) {
+  function setSortable() {
+    const containerSelector = '.content-body';
+    const containers = document.querySelectorAll(containerSelector);
+
+    if (containers.length === 0) {
+      return false;
+    }
+
+    const sortable = new Draggable.Sortable(containers, {
+      draggable: '.drag-item',
+      handle: '.dragger',
+      mirror: {
+        appendTo: containerSelector,
+        constrainDimensions: true,
+      },
+    });
+  }
+
+  const startup = function(filepath, adapterType, storageRef, cache=true) {
+    let adapter = null;
+
+    if (adapterType == 'firebase') {
+      adapter = sync;
+      sync.config({
+        storageRef: storageRef
+      });
+    }
+
+    SemanticDocs.config({
+      sync: adapter
+    });
 
     SemanticDocs.data(filepath, getRenderStrongNode())
     .then(data => {
@@ -1038,8 +1111,8 @@
       };
 
       function readNode(node) {
-        // Tree.render(buildTree(node));
-        jump(SemanticDocs.slugify(node.text, {lower: true}));
+        // Tree.render(buildTree(node))
+        jump(SemanticDocs.slugify(node.id, {lower: true}));
       }
 
       function readPrevNode() {
@@ -1063,10 +1136,10 @@
       function onZoomChanged() {
         let scale = d3.event.scale;
         // if (scale > SCALE_MAX) {
-        //   scale = SCALE_MAX;
+        //   scale = SCALE_MAX
         // }
         // if (scale < SCALE_MIN) {
-        //   scale = SCALE_MIN;
+        //   scale = SCALE_MIN
         // }
         graph.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + scale + ")");
       }
@@ -1095,9 +1168,8 @@
         ];
 
         // Store values
-        zoom
-          .translate(centerTranslate)
-          .scale(newScale);
+        zoom.translate(centerTranslate)
+            .scale(newScale);
 
         // Render transition
         graph.transition()
@@ -1111,19 +1183,20 @@
       zoom.on("zoom", onZoomChanged);
 
       function renderContent(text) {
-        // $('#content_editor').val(text)
         $(".content-body").html(text);
         $('.content-body')
         .children()
         .each(function(e) {
-          $(this).css({position: 'relative'});
-          $(this).append($('<div class="marker"><svg class="icon icon-files-empty"><use xlink:href="#icon-files-empty"></use></svg></div>'));
+          $(this).append($(markerString));
+          $(this).append($(draggerString));
+          $(this).addClass('drag-item');
+          $(this).attr('contentEditable', true);
         });
       }
 
       function renderGraph(nodes, links, start, zoom) {
         start = nodes[0];
-        // tree = Tree.render(buildTree(start));
+        // tree = Tree.render(buildTree(start))
         graph = DAG.render({nodes: nodes, links: links}, zoom, function(d) {
           if (d['id'] !== node_history[node_history.length - 1]['id']) {
             node_history.push(d);
@@ -1137,11 +1210,13 @@
       }
 
       // setTimeout(function() {
-      //   DAG.focus(start);
+      //   DAG.focus(start)
       // }, 2000)
 
       renderContent(text);
+      setSortable();
       MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+      // $('.content-body p').attr({'contentEditable': true})
 
       renderGraph(nodes, links, start, zoom);
 
@@ -1179,8 +1254,16 @@
         MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
       });
 
+      $('#save').on('click', function(e) {
+        saveChanged();
+      });
+
+      $('#login').on('click', function(e) {
+        login();
+      });
+
       $('.content').on('click', function(e) {
-        if (e.target.nodeName !== 'A') return;
+        if (e.target.nodeName !== 'A') return
         let id = e.target.hash.replace('#', '');
         if (nodes.filter(function(n) { return n["id"] == id }).length > 0) {
           if (id !== node_history[node_history.length - 1]['id']) {
@@ -1231,4 +1314,4 @@
 
   Object.defineProperty(exports, '__esModule', { value: true });
 
-})));
+}));
