@@ -118,8 +118,10 @@
 
 
 
-    <div id="firebaseui-auth-container"></div>
-    <div id="save">Save</div>
+    <div id="firebaseui-auth-container">
+      <div id="auth_close"><button>x</button></div>
+    </div>
+
     <div id="signin">Sign in</div>
 
     <div class="content">
@@ -146,11 +148,17 @@
       </div>
     </div>
 
+    <form method="POST" action="https://api.mindynode.com/v2/entry/josherich/dependent-writing/gh-pages/comments">
+      <label><input id="submit_filename" name="fields[filename]" type="text"></label>
+      <label><textarea id="submit_content" name="fields[content]"></textarea></label>
+      <button type="submit" id="save">Save</button>
+    </form>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.0.1/d3.v3.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/8.4.1/markdown-it.min.js"></script>
-    <script type="text/javascript"
-      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
+    <script src="https://unpkg.com/turndown/dist/turndown.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
     </script>
 
     <script src="https://www.gstatic.com/firebasejs/5.9.0/firebase.js"></script>
@@ -219,14 +227,20 @@
       })
 
       $('#signin').click((e) => {
-        ui.start('#firebaseui-auth-container', uiConfig);  
+        document.querySelector('#firebaseui-auth-container').style.display = 'block'
+        ui.start('#firebaseui-auth-container', uiConfig);
       })
+
+      $('#auth_close button').click((e) => {
+        document.querySelector('#firebaseui-auth-container').style.display = 'none'
+      })
+
     </script>
 
     <script src="./dist/app.js"></script>
     
     <script>
-      sd.demo(['ml.md'], "firebase", storageRef);
+      sd.demo(['/docs/math.md'], "github", storageRef);
     </script>
   </body>
 </html>

@@ -1,17 +1,20 @@
-# dependent-writing
+# Static Notebook
 
-demo: https://josherich.github.io/dependent-writing
+demo: [https://josherich.github.io/static-notebook](https://josherich.github.io/static-notebook)
 
-Writing notes with DAG and index
+Static Notebook with Github Pages
 
-## inspired by:
+## Install
 
-- https://bl.ocks.org/mbostock/4339083
+## Development
 
-- https://github.com/auchenberg/dependo
+## Inspired by:
+
+- [static man](https://staticman.net)
+
+- [https://bl.ocks.org/mbostock/4339083](https://bl.ocks.org/mbostock/4339083)
+
+- [https://github.com/auchenberg/dependo](https://github.com/auchenberg/dependo)
 
 - [VoodooPad](voodoopad.com)
 
-## Build
-
-## Develop

@@ -1,10 +1,11 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('markdown-it')) :
-  typeof define === 'function' && define.amd ? define(['exports', 'markdown-it'], factory) :
-  (global = global || self, factory(global.sd = global.sd || {}, global.markdownit));
-}(this, function (exports, markdownit) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('markdown-it'), require('turndown')) :
+  typeof define === 'function' && define.amd ? define(['exports', 'markdown-it', 'turndown'], factory) :
+  (global = global || self, factory(global.sd = global.sd || {}, global.markdownit, global.TurndownService));
+}(this, function (exports, markdownit, TurndownService) { 'use strict';
 
   markdownit = markdownit && markdownit.hasOwnProperty('default') ? markdownit['default'] : markdownit;
+  TurndownService = TurndownService && TurndownService.hasOwnProperty('default') ? TurndownService['default'] : TurndownService;
 
   // this file is based on https://github.com/valeriangalliat/markdown-it-anchor
   const slugify = function (string, options) {
@@ -1022,14 +1023,58 @@
     });
   };
 
+  let sync$1 = {};
+
+  sync$1.get = function(file, resolve) {
+    let uri = file;
+    return fetch(uri).then(response => response.text())
+  };
+
+  sync$1.set = function(string, file) {
+    // commit and push to file branch
+  };
+
+  let turndownService = new TurndownService();
+
+  turndownService = turndownService.addRule('mathmlinline', {
+    filter: '.mjx-chtml.MathJax_CHTML',
+    replacement: function (content, node, options) {
+      return node.nextSibling.innerHTML
+    }
+  });
+
+  turndownService = turndownService.addRule('mathmldisplay', {
+    filter: '.mjx-chtml.MJXc-display',
+    replacement: function (content, node, options) {
+      return node.nextSibling.innerHTML
+    }
+  });
+
+  let Service = {
+    save: function(container) {
+      let mds = [];
+      Array.prototype.slice.call(container.children).map((e) => {
+        let md = turndownService.turndown(e.outerHTML);
+        mds.push(md);
+      });
+      return mds.join('\n')
+    }
+  };
+
   MathJax.Hub.Config({
     tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
   });
 
-  let GRAPH_WRITING_KEY = 'GRAPH_WRITING_CONTENT_TMP';
-  let GRAPH_WRITING_OPTION_STRONG = 'GRAPH_WRITING_OPTION_STRONG';
-  let markerString = '<div class="marker"><svg class="icon icon-files-empty"><use xlink:href="#icon-files-empty"></use></svg></div>';
-  let draggerString = '<div class="dragger"><div class="clearfix pbs"><svg class="icon icon-more_vert"><use xlink:href="#icon-more_vert"></use></svg></div></div>';
+  const CONTAINER_TAG = '.content-body';
+  const MARKER_STACK_TAG = '#marker_stash';
+  const MODAL_TAG = '.modal.js';
+  const MODAL_CLOSE_TAG = '.modal.js .modal-close';
+
+  const GRAPH_WRITING_KEY = 'GRAPH_WRITING_CONTENT_TMP';
+  const GRAPH_WRITING_OPTION_STRONG = 'GRAPH_WRITING_OPTION_STRONG';
+  const markerString = '<div class="marker"><svg class="icon icon-files-empty"><use xlink:href="#icon-files-empty"></use></svg></div>';
+  const draggerString = '<div class="dragger"><div class="clearfix pbs"><svg class="icon icon-more_vert"><use xlink:href="#icon-more_vert"></use></svg></div></div>';
+
   let node_history = [];
   let history_ptr = 0;
   let start = null;
@@ -1057,7 +1102,7 @@
   }
 
   function setSortable() {
-    const containerSelector = '.content-body';
+    const containerSelector = CONTAINER_TAG;
     const containers = document.querySelectorAll(containerSelector);
 
     if (containers.length === 0) {
@@ -1082,6 +1127,8 @@
       sync.config({
         storageRef: storageRef
       });
+    } else if (adapterType == 'github') {
+      adapter = sync$1;
     }
 
     SemanticDocs.config({
@@ -1183,8 +1230,8 @@
       zoom.on("zoom", onZoomChanged);
 
       function renderContent(text) {
-        $(".content-body").html(text);
-        $('.content-body')
+        $(CONTAINER_TAG).html(text);
+        $(CONTAINER_TAG)
         .children()
         .each(function(e) {
           $(this).append($(markerString));
@@ -1216,14 +1263,14 @@
       renderContent(text);
       setSortable();
       MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
-      // $('.content-body p').attr({'contentEditable': true})
+      // $(CONTAINER_TAG + 'p').attr({'contentEditable': true})
 
       renderGraph(nodes, links, start, zoom);
 
       buildIndex(index);
 
       function attachToStash(mark) {
-        $('#marker_stash').append(mark);
+        $(MARKER_STACK_TAG).append(mark);
       }
 
       function toggle_graph() {
@@ -1233,7 +1280,7 @@
       }
 
       function toggle_setting() {
-        $('.modal.js').toggle();
+        $(MODAL_TAG).toggle();
       }
 
       function toggle_index() {
@@ -1255,11 +1302,12 @@
       });
 
       $('#save').on('click', function(e) {
-        saveChanged();
+        let mds = Service.save(document.querySelector(CONTAINER_TAG));
+        Service.submit(mds);
       });
 
       $('#login').on('click', function(e) {
-        login();
+        Service.login();
       });
 
       $('.content').on('click', function(e) {
@@ -1274,7 +1322,7 @@
         }
       });
 
-      $('.content-body').on('click', function(e) {
+      $(CONTAINER_TAG).on('click', function(e) {
         if (e.target.parentNode.className === 'marker') {
           let mark = $(e.target).parent().parent().clone();
           let close = $(mark).find('.marker');
@@ -1283,13 +1331,13 @@
         }
       });
 
-      $('#marker_stash').on('click', function(e) {
+      $(MARKER_STACK_TAG).on('click', function(e) {
         if (e.target.className === 'marker') {
           $(e.target).parent().remove();
         }
       });
 
-      $('.modal.js .modal-close').on('click', function(e) {
+      $(MODAL_CLOSE_TAG).on('click', function(e) {
         SemanticDocs.data(filepath, getRenderStrongNode())
         .then(data => {
           let nodes = data.nodes;

@@ -425,6 +425,23 @@ path.link.resolved {
   cursor: pointer;
 }
 
+#auth_close {
+  text-align: center;
+  position: absolute;
+  bottom: 20px;
+  width: 100%;
+}
+
+#auth_close button {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.3);
+  border: none;
+  cursor: pointer;
+  color: white;
+}
+
 .drag-item {
   position: relative;
   padding-left: 20px;
@@ -446,4 +463,5 @@ path.link.resolved {
 .draggable-source--is-dragging {
   border: 2px dashed rgba(0,0,0,0.1);
   box-sizing: border-box;
+  opacity: 0.5;
 }

@@ -1,6 +1,6 @@
 import markdownit from 'markdown-it'
-import anchor_plugin from './anchor'
-import footnote_plugin from './footnote'
+import anchor_plugin from './vendors/anchor'
+import footnote_plugin from './vendors/footnote'
 
 let content_cache = null
 let converter = markdownit()

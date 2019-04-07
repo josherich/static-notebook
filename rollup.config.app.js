@@ -10,8 +10,9 @@ export default {
     file: "dist/app.js",
     format: "umd",
     globals: {
-      'markdown-it': 'markdownit',
-      "@shopify/draggable": 'draggable'
+      "markdown-it": "markdownit",
+      "@shopify/draggable": "draggable",
+      "turndown": "TurndownService"
     },
     plugins: [
       babel({

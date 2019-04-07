@@ -5,14 +5,28 @@ MathJax.Hub.Config({
 import SemanticDocs from './index'
 import DAG from './dag'
 import firebase from './adapter-firebase'
+import github from './adapter-github'
+import Service from './service'
 
-let GRAPH_WRITING_KEY = 'GRAPH_WRITING_CONTENT_TMP'
-let GRAPH_WRITING_OPTION_STRONG = 'GRAPH_WRITING_OPTION_STRONG'
-let markerString = '<div class="marker"><svg class="icon icon-files-empty"><use xlink:href="#icon-files-empty"></use></svg></div>'
-let draggerString = '<div class="dragger"><div class="clearfix pbs"><svg class="icon icon-more_vert"><use xlink:href="#icon-more_vert"></use></svg></div></div>'
+const CONTAINER_TAG = '.content-body'
+const MARKER_STACK_TAG = '#marker_stash'
+const MODAL_TAG = '.modal.js'
+const MODAL_CLOSE_TAG = '.modal.js .modal-close'
+const CONTROL_PANEL_TAG = '#control_panel'
+const TOGGLE_GRAPH_TAG = '#toggle_graph'
+const TOGGLE_INDEX_TAG = '#toggle_index'
+const TOGGLE_SETTING_TAG = '#toggle_setting'
+const BACK_TAG = '#content_back'
+const FORWARD_TAG = '#content_forward'
 
-let SCALE_MAX = 2
-let SCALE_MIN = 0.5
+const GRAPH_WRITING_KEY = 'GRAPH_WRITING_CONTENT_TMP'
+const GRAPH_WRITING_OPTION_STRONG = 'GRAPH_WRITING_OPTION_STRONG'
+const markerString = '<div class="marker"><svg class="icon icon-files-empty"><use xlink:href="#icon-files-empty"></use></svg></div>'
+const draggerString = '<div class="dragger"><div class="clearfix pbs"><svg class="icon icon-more_vert"><use xlink:href="#icon-more_vert"></use></svg></div></div>'
+
+const SCALE_MAX = 2
+const SCALE_MIN = 0.5
+
 let node_history = []
 let history_ptr = 0
 let start = null
@@ -45,7 +59,7 @@ function setRenderStrongNode(use_strong) {
 }
 
 function setSortable() {
-  const containerSelector = '.content-body';
+  const containerSelector = CONTAINER_TAG;
   const containers = document.querySelectorAll(containerSelector);
 
   if (containers.length === 0) {
@@ -71,6 +85,8 @@ const startup = function(filepath, adapterType, storageRef, cache=true) {
     firebase.config({
       storageRef: storageRef
     })
+  } else if (adapterType == 'github') {
+    adapter = github
   }
 
   SemanticDocs.config({
@@ -190,8 +206,8 @@ const startup = function(filepath, adapterType, storageRef, cache=true) {
     zoom.on("zoom", onZoomChanged)
 
     function renderContent(text) {
-      $(".content-body").html(text)
-      $('.content-body')
+      $(CONTAINER_TAG).html(text)
+      $(CONTAINER_TAG)
       .children()
       .each(function(e) {
         $(this).append($(markerString))
@@ -223,14 +239,14 @@ const startup = function(filepath, adapterType, storageRef, cache=true) {
     renderContent(text)
     setSortable()
     MathJax.Hub.Queue(["Typeset",MathJax.Hub])
-    // $('.content-body p').attr({'contentEditable': true})
+    // $(CONTAINER_TAG + 'p').attr({'contentEditable': true})
 
     renderGraph(nodes, links, start, zoom)
 
     buildIndex(index)
 
     function attachToStash(mark) {
-      $('#marker_stash').append(mark)
+      $(MARKER_STACK_TAG).append(mark)
     }
 
     function toggle_graph() {
@@ -240,7 +256,7 @@ const startup = function(filepath, adapterType, storageRef, cache=true) {
     }
 
     function toggle_setting() {
-      $('.modal.js').toggle()
+      $(MODAL_TAG).toggle()
     }
 
     function toggle_tree() {
@@ -270,11 +286,12 @@ const startup = function(filepath, adapterType, storageRef, cache=true) {
     })
 
     $('#save').on('click', function(e) {
-      saveChanged()
+      let mds = Service.save(document.querySelector(CONTAINER_TAG))
+      Service.submit(mds)
     })
 
     $('#login').on('click', function(e) {
-      login()
+      Service.login()
     })
 
     $('.content').on('click', function(e) {
@@ -289,7 +306,7 @@ const startup = function(filepath, adapterType, storageRef, cache=true) {
       }
     })
 
-    $('.content-body').on('click', function(e) {
+    $(CONTAINER_TAG).on('click', function(e) {
       if (e.target.parentNode.className === 'marker') {
         let mark = $(e.target).parent().parent().clone()
         let close = $(mark).find('.marker')
@@ -298,13 +315,13 @@ const startup = function(filepath, adapterType, storageRef, cache=true) {
       }
     })
 
-    $('#marker_stash').on('click', function(e) {
+    $(MARKER_STACK_TAG).on('click', function(e) {
       if (e.target.className === 'marker') {
         $(e.target).parent().remove()
       }
     })
 
-    $('.modal.js .modal-close').on('click', function(e) {
+    $(MODAL_CLOSE_TAG).on('click', function(e) {
       SemanticDocs.data(filepath, getRenderStrongNode())
       .then(data => {
         let nodes = data.nodes
