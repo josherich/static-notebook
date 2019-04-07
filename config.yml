@@ -16,7 +16,7 @@ save:
   branch: "master"
 
   # Text to use as the commit message or pull request title. Accepts placeholders.
-  commitMessage: "file updated - {fields.filename}"
+  commitMessage: "file updated"
 
   # (*) REQUIRED
   #
