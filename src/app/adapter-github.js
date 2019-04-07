@@ -1,7 +1,7 @@
 let sync = {}
-
-sync.get = function(file, resolve) {
-  let uri = file
+const REPO = 'static-notebook'
+sync.get = function(filePath, resolve) {
+  let uri = `${REPO}${filePath}`
   return fetch(uri).then(response => response.text())
 }
 
