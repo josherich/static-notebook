@@ -23,7 +23,7 @@ let Service = {
       let md = turndownService.turndown(e.outerHTML)
       mds.push(md)
     })
-    return mds.join('\n')
+    return mds.join('\n\n')
   }
 }
 

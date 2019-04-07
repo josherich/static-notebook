@@ -498,7 +498,6 @@
     md.core.ruler.after('inline', 'footnote_tail', footnote_tail);
   };
 
-  let content_cache = null;
   let converter = markdownit();
   anchor_plugin(converter, {});
   footnote_plugin(converter);
@@ -666,11 +665,7 @@
       }
     }
 
-    if (content_cache) {
-      return new Promise((resolve, reject) => {
-        resolve(parse(content_cache));
-      })
-    } else {
+    {
       let tasks = [];
       if (!Array.isArray(filepath)) {
         filepath = [filepath];
@@ -682,9 +677,7 @@
 
       return Promise.all(tasks)
         .then(textArray => {
-          let alltext = textArray.join('\n');
-          content_cache = alltext;
-          return parse(alltext)
+          return parse(textArray[0])
         })
     }
   };
@@ -1302,8 +1295,11 @@
       });
 
       $('#save').on('click', function(e) {
+        e.preventDefault();
         let mds = Service.save(document.querySelector(CONTAINER_TAG));
-        Service.submit(mds);
+        $('#field_filename').val('math');
+        $('#field_content').val(mds);
+        $('#save_form').submit();
       });
 
       $('#login').on('click', function(e) {

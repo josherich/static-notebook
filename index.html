@@ -148,9 +148,9 @@
       </div>
     </div>
 
-    <form method="POST" action="https://api.mindynode.com/v2/entry/josherich/dependent-writing/gh-pages/comments">
-      <label><input id="submit_filename" name="fields[filename]" type="text"></label>
-      <label><textarea id="submit_content" name="fields[content]"></textarea></label>
+    <form id="save_form" method="POST" action="http://sn.mindynode.com/v2/entry/josherich/static-notebook/master/save">
+      <label style="display: none"><input id="field_filename" name="fields[filename]" type="text"></label>
+      <label style="display: none"><textarea id="field_content" name="fields[content]"></textarea></label>
       <button type="submit" id="save">Save</button>
     </form>
 
@@ -240,7 +240,7 @@
     <script src="./dist/app.js"></script>
     
     <script>
-      sd.demo(['/static-notebook/docs/math.md'], "github", storageRef);
+      sd.demo(['/docs/math.md'], "github", storageRef);
     </script>
   </body>
 </html>

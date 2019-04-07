@@ -186,9 +186,7 @@ SemanticDocs.data = (filepath, use_strong) => {
 
     return Promise.all(tasks)
       .then(textArray => {
-        let alltext = textArray.join('\n')
-        content_cache = alltext
-        return parse(alltext)
+        return parse(textArray[0])
       })
   }
 }

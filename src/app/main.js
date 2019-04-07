@@ -286,8 +286,11 @@ const startup = function(filepath, adapterType, storageRef, cache=true) {
     })
 
     $('#save').on('click', function(e) {
+      e.preventDefault()
       let mds = Service.save(document.querySelector(CONTAINER_TAG))
-      Service.submit(mds)
+      $('#field_filename').val('math')
+      $('#field_content').val(mds)
+      $('#save_form').submit()
     })
 
     $('#login').on('click', function(e) {
