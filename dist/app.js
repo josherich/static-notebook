@@ -1017,9 +1017,9 @@
   };
 
   let sync$1 = {};
-
-  sync$1.get = function(file, resolve) {
-    let uri = file;
+  const REPO = 'static-notebook';
+  sync$1.get = function(filePath, resolve) {
+    let uri = `${REPO}${filePath}`;
     return fetch(uri).then(response => response.text())
   };
 
@@ -1050,7 +1050,7 @@
         let md = turndownService.turndown(e.outerHTML);
         mds.push(md);
       });
-      return mds.join('\n')
+      return mds.join('\n\n')
     }
   };
 
