@@ -106,13 +106,13 @@
         </div>
       </div>
       
-      <div id="toggle_setting">
+<!--       <div id="toggle_setting">
         <div class="control-icon">
             <div class="clearfix pbs">
                 <svg class="icon icon-cogs"><use xlink:href="#icon-cogs"></use></svg>
             </div>
         </div>
-      </div>
+      </div> -->
       <!-- <span id="toggle_edit">Edit</span> -->
     </div>
 
@@ -141,8 +141,8 @@
         <div class="modal-body">
           <div class="modal-close">x</div>
           <div>
-            <input type="checkbox" id="toggle_strong_node">
-            <label for="toggle_strong_node">Only render **strong** nodes</label>
+            
+            <label for="toggle_strong_node"><input type="checkbox" id="toggle_strong_node" name="toggle_strong_node">Only render **strong** nodes</label>
           </div>
         </div>
       </div>
@@ -158,89 +158,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/8.4.1/markdown-it.min.js"></script>
     <script src="https://unpkg.com/turndown/dist/turndown.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
-    </script>
-
-    <script src="https://www.gstatic.com/firebasejs/5.9.0/firebase.js"></script>
-    <script src="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     
     <script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.8/lib/draggable.bundle.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.8/lib/sortable.js"></script>
 
-    <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css"/>
-    <script>
-      function setUISignin() {
-        document.querySelector('#firebaseui-auth-container').style.display = 'none'
-        document.querySelector('#save').style.display = 'block'
-        document.querySelector('#signin').style.display = 'none'
-      }
-      function setUISignout() {
-        document.querySelector('#firebaseui-auth-container').style.display = 'none'
-        document.querySelector('#save').style.display = 'none'
-        document.querySelector('#signin').style.display = 'block'
-      }
-      // Initialize Firebase
-      let config = {
-        apiKey: "AIzaSyDtAy_fTes6za3eiHXS6Ug9Fl0QVzLolgM",
-        authDomain: "notebook-47f55.firebaseapp.com",
-        projectId: "notebook-47f55",
-        storageBucket: "notebook-47f55.appspot.com",
-        messagingSenderId: "634188757877"
-      }
-      firebase.initializeApp(config)
-      let storage = firebase.storage()
-      let storageRef = storage.ref()
-      let ui = new firebaseui.auth.AuthUI(firebase.auth());
-      let uiConfig = {
-        callbacks: {
-          signInSuccessWithAuthResult: function(authResult, redirectUrl) {
-            // User successfully signed in.
-            // Return type determines whether we continue the redirect automatically
-            // or whether we leave that to developer to handle.
-            console.log(authResult)
-            setUISignin()
-            return true;
-          },
-          uiShown: function() {
-            // The widget is rendered.
-            // Hide the loader.
-            // document.getElementById('loader').style.display = 'none';
-          }
-        },
-        // Will use popup for IDP Providers sign-in flow instead of the default, redirect.
-        signInFlow: 'popup',
-        signInSuccessUrl: 'http://localhost:8081',
-        signInOptions: [
-          // Leave the lines as is for the providers you want to offer your users.
-          firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-          firebase.auth.EmailAuthProvider.PROVIDER_ID
-        ]
-      };
-
-      firebase.auth().onAuthStateChanged(function(user) {
-        if (user) {
-          console.log(user)
-          setUISignin()
-        } else {
-          setUISignout()
-        }
-      })
-
-      $('#signin').click((e) => {
-        document.querySelector('#firebaseui-auth-container').style.display = 'block'
-        ui.start('#firebaseui-auth-container', uiConfig);
-      })
-
-      $('#auth_close button').click((e) => {
-        document.querySelector('#firebaseui-auth-container').style.display = 'none'
-      })
-
-    </script>
-
     <script src="./dist/app.js"></script>
     
     <script>
-      sd.demo(['/docs/math.md'], "github", storageRef);
+      sd.demo(['docs/math.md'], "github", {});
     </script>
   </body>
 </html>
