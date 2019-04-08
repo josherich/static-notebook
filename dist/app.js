@@ -1017,9 +1017,8 @@
   };
 
   let sync$1 = {};
-  const REPO = 'static-notebook';
   sync$1.get = function(filePath, resolve) {
-    let uri = `${REPO}${filePath}`;
+    let uri = filePath;
     return fetch(uri).then(response => response.text())
   };
 
